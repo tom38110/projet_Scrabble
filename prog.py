@@ -1,6 +1,6 @@
 import random
 
-# testée : renvoie une liste de listes contenant les coordonnées des bonus TEST
+# testée : renvoie une liste de listes contenant les coordonnées des bonus 
 def init_bonus():
     bonus = []
     cases_MT = [[0,0],[0,7],[0,14],[7,0],[7,14],[14,0],[14,7],[14,14]]
