@@ -3,8 +3,7 @@ import random
 # testée : renvoie une liste de listes contenant les coordonnées des bonus 
 def init_bonus():
     bonus = []
-    cases_MT = [[0,0],[0,7],[0,14],[7,0],[7,14],[14,0],[14,7],[14,14]]
-    cases_MD = [[1,1],[1,13],[2,2],[2,12],[3,3],[3,11],[4,4],[4,10],[7,7],[10,4],[10,10],[11,3],[11,11],[12,2],[12,12],[13,1],[13,13]]
+    cases_MT = [[0,0],[0JE CASSE TOUTTOU 11],[4,4],[4,10],[7,7],[10,4],[10,10],[11,3],[11,11],[12,2],[12,12],[13,1],[13,13]]
     cases_LT = [[1,5],[1,9],JE CASSE TOUT !!!
     return bonus
 
