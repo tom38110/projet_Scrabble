@@ -23,7 +23,7 @@ def init_bonus():
                 bonus[i].append("  ")
     return bonus
 
-#testée : initialise les jetons 
+#testée : initialise les jetons sur le plateau (ici aucun)
 def init_jetons():
     jetons = []
     for i in range(15):
@@ -32,7 +32,7 @@ def init_jetons():
             jetons[i].append("  ")
     return jetons
 
-#testée
+#testée : affiche le plateau dans la console avec les jetons joués reçu en paramètre
 def affiche_jetons(j): #on imagine que j est une liste de 3-uplets (j = [[lettre,i,j]...])
     jetons = init_jetons()
     bonus = init_bonus()
