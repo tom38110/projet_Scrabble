@@ -23,7 +23,7 @@ def init_bonus():
                 bonus[i].append("  ")
     return bonus
 
-#testée : initialise les jetons sur le plateau (ici aucun)
+# testée : initialise les jetons sur le plateau (ici aucun)
 def init_jetons():
     jetons = []
     for i in range(15):
@@ -32,8 +32,8 @@ def init_jetons():
             jetons[i].append("  ")
     return jetons
 
-#testée : affiche le plateau dans la console avec les jetons joués reçu en paramètre
-def affiche_jetons(j): #on imagine que j est une liste de 3-uplets (j = [[lettre,i,j]...])
+# testée : affiche le plateau dans la console avec les jetons joués reçu en paramètre
+def affiche_jetons(j): # on imagine que j est une liste de 3-uplets (j = [[lettre,i,j]...])
     jetons = init_jetons()
     bonus = init_bonus()
     for k in range(len(j)):
@@ -45,7 +45,7 @@ def affiche_jetons(j): #on imagine que j est une liste de 3-uplets (j = [[lettre
         for col in range(15):
             if jetons[line][col] == "  ":
                 if bonus[line][col] == "MT":
-                    print('$$', end = '')
+                    print('$$', end = '') 
                 elif bonus[line][col] == "MD":
                     print('**', end = '')
                 elif bonus[line][col] == "LT":
@@ -71,10 +71,10 @@ def affiche_jetons(j): #on imagine que j est une liste de 3-uplets (j = [[lettre
         for col in range(15):
             print("--", end = '')
             if col<14:
-                print("||", end = '')
+                print("||", end = '') # séparation des colonnes par || et des lignes par -- pour essayer de former un carré
         print()
 
-# testée
+# testée : renvoie le dico de tous les jetons avec leurs occurences et leurs valeurs
 def init_dico():
     dico = {'A': {'occ': 9, 'val': 1}, 'B': {'occ': 2, 'val': 3}, 'C': {'occ': 2, 'val': 3}, 'D': {'occ': 3, 'val': 2}, 'E': {'occ': 15, 'val': 1}, 'F': {'occ': 2, 'val': 4}, 'G': {'occ': 2, 'val': 2}, 'H': {'occ': 2, 'val': 4}, 'I': {'occ': 8, 'val': 1}, 'J': {'occ': 1, 'val': 8}, 'K': {'occ': 1, 'val': 10}, 'L': {'occ': 5, 'val': 1}, 'M': {'occ': 3, 'val': 2}, 'N': {'occ': 6, 'val': 1}, 'O': {'occ': 6, 'val': 1}, 'P': {'occ': 2, 'val': 3}, 'Q': {'occ': 1, 'val': 8}, 'R': {'occ': 6, 'val': 1}, 'S': {'occ': 6, 'val': 1}, 'T': {'occ': 6, 'val': 1}, 'U': {'occ': 6, 'val': 1}, 'V': {'occ': 2, 'val': 4}, 'W': {'occ': 1, 'val': 10}, 'X': {'occ': 1, 'val': 10}, 'Y': {'occ': 1, 'val': 10}, 'Z': {'occ': 1, 'val': 10}, '?': {'occ': 2, 'val': 0}}
     return dico
@@ -90,34 +90,35 @@ def init_dico():
 #     lettre = chr(ord(lettre)+1)
 # print(dico)
 
-# testée
+# testée : reçoit en paramètre le dictionnaire de la fonction précédente et renvoie une liste des clé du dictionnaire c'est-à-dire des jetons le nombres qu'ils doivent apparaître
 def init_pioche(dico):
-    alphab = list(dico.keys())
+    alphab = list(dico.keys()) # on récupère la liste des clés du dictionnaire
     sac = []
-    for e in alphab:
-        for i in range(dico[e]['occ']):
+    for e in alphab: # e prends la valeur de chaque clé
+        for i in range(dico[e]['occ']): # boucle pour ajouter le jetons dans la liste autant de fois que son occurence
             sac.append(e)
     return sac
 
-#testée
+# testée : reçoit en paramètre le nombre de jetons x à prendre dans le sac qui est la liste des jetons et renvoie la main d'un joueur ainsi créée
 def piocher(x,sac):
     main = []
     for i in range(x):
-        indice = random.randint(0,len(sac)-1)
-        main.append(sac[indice])
-        sac.pop(indice)
+        indice = random.randint(0,len(sac)-1) # on choisit un indice au hasard dans le sac
+        main.append(sac[indice]) # on ajoute ce jeton à la main
+        sac.pop(indice) # on le supprime de la liste sac
     return main
 
-#testé
+#pas testé : reçoit en paramètre la main du joueur et le sac sous forme de liste et complète la main si elle ne contient pas 7 jetons et si c'est possible
 def completer_main(main,sac):
-    x = 7 - len(main)
-    if len(sac) >= x:
+    x = 7 - len(main) # on définit le nombre de jetons à piocher
+    if len(sac) >= x: # si c'est possible on complète
         pioche = piocher(x,sac)
-    else:
+    else: # sinon on complète juste avec ce qu'il reste
         pioche = piocher(len(sac),sac)
-    for i in range(len(pioche)):
+    for i in range(len(pioche)): # on rajoute ce qu'on a pioché à la main
         main.append(pioche[i])
 
+#pas testé : reçoit en paramètre la liste de jetons que le joueur veut échanger, sa main et le sac de jetons et effectue l'échange si c'est possible sinon renvoie que c'est pas possible
 def echanger(jetons,main,sac): # jetons est la liste des jetons défaussés
     possible = True # booléen qui va dire si l'échange est possible
     maintemp = list(main) # création d'une main temporaire pour comparer avec jetons
@@ -141,41 +142,43 @@ def echanger(jetons,main,sac): # jetons est la liste des jetons défaussés
         possible = False
     return possible
 
+# testé : reçoit en paramètre un fichier contenant tout les mots jouables au Scrabble et renvoie une liste de ces mots
 def generer_dico(nf):
     autorises = []
-    for ligne in nf:
-        autorises.append(ligne.replace("\n", ""))
+    for ligne in nf: # on parcours toutes les lignes du fichier
+        autorises.append(ligne.replace("\n", "")) # on ajoute le mot à la liste et on remplace le retour à la ligne par une chaîne vide pour ne pas avoir des \n dans la liste
     return autorises
 
+# testé : reçoit en paramètre un mot que le joueur veut jouer et la main du joueur et renvoie si il est jouable ou non
 def mot_jouable(mot,ll):
-    lltemp = list(ll)
-    possible = len(mot) <= len(ll)
-    i = 0
-    nbe = 0
-    while i < len(mot):
+    lltemp = list(ll) # création d'une liste temporaire pour ne pas modifier l'original qui est la main du joueur
+    possible = len(mot) <= len(ll) # vérifie que le mot est plus court que le nombre de jetons dans la main
+    nbe = 0 # initialisation du nombre d'erreur
+    for i in range(len(mot)): # boucle qui vérifie si chaque lettre du mot est dans la liste
         possible = possible and mot[i] in lltemp
-        if possible:
+        if possible: # si oui enlève la lettre en question dans la liste temporaire pour pas qu'elle soit réutilisée
             lltemp.remove(mot[i])
-        elif mot[i] not in lltemp:
+        elif mot[i] not in lltemp: # si la lettre n'est pas dans la liste temporaire augmente le nombre d'erreur
             nbe = nbe + 1
-        i = i + 1
-    if nbe <= ll.count('?'):
-        possible = True and len(mot) <= len(ll)
+    if nbe <= ll.count('?'): # si le nombre d'erreur est inférieur ou égal au nombre de joker dans la main du joueur alors le mot est jouable
+        possible = True and len(mot) <= len(ll) # on revérifie si le mot est plus court que la longueur de la main du joueur
     return possible
 
+# testé : reçoit en paramètre la liste de tous les mots jouables au Scrabble et la main du joueur et renvoie une liste de tout les mots qui sont jouables à partir de la main
 def mots_jouables(motsfr,ll):
     motsjouables = [] 
-    for e in motsfr:
-        if mot_jouable(e, ll):
+    for e in motsfr: # e prend successivement la valeur de chaque mot dans la liste des mots jouables
+        if mot_jouable(e, ll): # si le mot est bien jouable à partir de la main du joueur on l'ajoute à la liste
             motsjouables.append(e)
     return motsjouables
 
+#pas testé : reçoit en paramètre un mot que le joueur veut jouer ainsi que le dictionnaire contenant tous les jetons et leur valeur et renvoie la valeur du mot en question
 def valeur_mot(mot,dico):
     val = 0
-    if len(mot) == 7:
+    if len(mot) == 7: # si le mot a une longueur de 7 lettre rajoute direct 50 points
         val = 50
-    for e in mot:
-        val = val + dico[e]['val']
+    for e in mot: # e prend successivement chaque lettre du mot
+        val = val + dico[e]['val'] # on rajoute la valeur de la lettre à la somme des valeurs de chaque lettre
     return val
 
 def meilleur_mot(motsfr,ll,dico): 
@@ -225,7 +228,7 @@ def meilleurs_mots(motsfr,ll,dico):
 
 
 #prog.principal
-# affiche_jetons([])
+affiche_jetons([])
 dico = init_dico()
 sac = init_pioche(dico)
 nbj = int(input("Donnez le nombre de joueurs (entre 2 et 4) : "))
