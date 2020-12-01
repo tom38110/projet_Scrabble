@@ -278,3 +278,5 @@ les_meilleurs = meilleurs_mots(motsfr, mainj1, dico)
 print("Voici la liste des meilleurs mots que vous pouvez jouer (ce qui rapport le plus de point) : ", les_meilleurs)
 for e in les_meilleurs:
     print("Voici la valeur de", e, ":", valeur_mot(e, dico)) # on teste les fonctions qui donnent la valeur d'un mot
+
+scrable
