@@ -108,7 +108,7 @@ def piocher(x,sac):
         sac.pop(indice) # on le supprime de la liste sac
     return main
 
-#pas testé : reçoit en paramètre la main du joueur et le sac sous forme de liste et complète la main si elle ne contient pas 7 jetons et si c'est possible
+#pas testée : reçoit en paramètre la main du joueur et le sac sous forme de liste et complète la main si elle ne contient pas 7 jetons et si c'est possible
 def completer_main(main,sac):
     x = 7 - len(main) # on définit le nombre de jetons à piocher
     if len(sac) >= x: # si c'est possible on complète
@@ -118,7 +118,7 @@ def completer_main(main,sac):
     for i in range(len(pioche)): # on rajoute ce qu'on a pioché à la main
         main.append(pioche[i])
 
-#pas testé : reçoit en paramètre la liste de jetons que le joueur veut échanger, sa main et le sac de jetons et effectue l'échange si c'est possible sinon renvoie que c'est pas possible
+#pas testée : reçoit en paramètre la liste de jetons que le joueur veut échanger, sa main et le sac de jetons et effectue l'échange si c'est possible sinon renvoie que c'est pas possible
 def echanger(jetons,main,sac): # jetons est la liste des jetons défaussés
     possible = True # booléen qui va dire si l'échange est possible
     maintemp = list(main) # création d'une main temporaire pour comparer avec jetons
@@ -142,14 +142,14 @@ def echanger(jetons,main,sac): # jetons est la liste des jetons défaussés
         possible = False
     return possible
 
-# testé : reçoit en paramètre un fichier contenant tout les mots jouables au Scrabble et renvoie une liste de ces mots
+# testée : reçoit en paramètre un fichier contenant tout les mots jouables au Scrabble et renvoie une liste de ces mots
 def generer_dico(nf):
     autorises = []
     for ligne in nf: # on parcours toutes les lignes du fichier
         autorises.append(ligne.replace("\n", "")) # on ajoute le mot à la liste et on remplace le retour à la ligne par une chaîne vide pour ne pas avoir des \n dans la liste
     return autorises
 
-# testé : reçoit en paramètre un mot que le joueur veut jouer et la main du joueur et renvoie si il est jouable ou non
+# testée : reçoit en paramètre un mot que le joueur veut jouer et la main du joueur et renvoie si il est jouable ou non
 def mot_jouable(mot,ll):
     lltemp = list(ll) # création d'une liste temporaire pour ne pas modifier l'original qui est la main du joueur
     possible = len(mot) <= len(ll) # vérifie que le mot est plus court que le nombre de jetons dans la main
@@ -164,7 +164,7 @@ def mot_jouable(mot,ll):
         possible = True and len(mot) <= len(ll) # on revérifie si le mot est plus court que la longueur de la main du joueur
     return possible
 
-# testé : reçoit en paramètre la liste de tous les mots jouables au Scrabble et la main du joueur et renvoie une liste de tout les mots qui sont jouables à partir de la main
+# testée : reçoit en paramètre la liste de tous les mots jouables au Scrabble et la main du joueur et renvoie une liste de tout les mots qui sont jouables à partir de la main
 def mots_jouables(motsfr,ll):
     motsjouables = [] 
     for e in motsfr: # e prend successivement la valeur de chaque mot dans la liste des mots jouables
@@ -172,7 +172,7 @@ def mots_jouables(motsfr,ll):
             motsjouables.append(e)
     return motsjouables
 
-#pas testé : reçoit en paramètre un mot que le joueur veut jouer ainsi que le dictionnaire contenant tous les jetons et leur valeur et renvoie la valeur du mot en question
+#pas testée : reçoit en paramètre un mot que le joueur veut jouer ainsi que le dictionnaire contenant tous les jetons et leur valeur et renvoie la valeur du mot en question
 def valeur_mot(mot,dico):
     val = 0
     if len(mot) == 7: # si le mot a une longueur de 7 lettre rajoute direct 50 points
@@ -181,25 +181,27 @@ def valeur_mot(mot,dico):
         val = val + dico[e]['val'] # on rajoute la valeur de la lettre à la somme des valeurs de chaque lettre
     return val
 
+#pas testée : reçoit en paramètre la liste de tous les mots jouables au Scrabble, la main du joueur et le dictionnaire de tous les jetons avec leur valeur et renvoie le mot jouable qui rapporte le plus de point 
 def meilleur_mot(motsfr,ll,dico): 
     result = ""
     valmeilleurmot = 0
-    motsjouables = mots_jouables(motsfr, ll)
-    for mot in motsjouables:
-        valmot = valeur_mot(mot, dico)
-        if valmot > valmeilleurmot:
+    motsjouables = mots_jouables(motsfr, ll) # on récupère la liste des mots jouables
+    for mot in motsjouables: # on parcours chaque mot de cette liste
+        valmot = valeur_mot(mot, dico) 
+        if valmot > valmeilleurmot: # on vérifie si la valeur du mot est supérieur à celle du meilleur mot actuel
             result = mot
             valmeilleurmot = valmot
-    return result
+    return result # si il n'y a aucun mot on renvoie une chaîne vide
 
+#pas testée :  reçoit en paramètre la liste de tous les mots jouables au Scrabble, la main du joueur et le dictionnaire de tous les jetons avec leur valeur et renvoie la liste de tous les meilleurs mots jouables (qui font gagner le même nombre de point) 
 def meilleurs_mots(motsfr,ll,dico):
     res = []
-    meilleurmot = meilleur_mot(motsfr, ll, dico)
-    if meilleurmot != "":
-        motsjouables = mots_jouables(motsfr, ll)
-        valmeilleurmot = valeur_mot(meilleurmot, dico)
+    meilleurmot = meilleur_mot(motsfr, ll, dico) # on récupère le meilleur mot jouable
+    if meilleurmot != "": # si il existe bien un meilleur mot on peut continuer
+        motsjouables = mots_jouables(motsfr, ll) # on récupère la liste des mots jouables
+        valmeilleurmot = valeur_mot(meilleurmot, dico) 
         for mot in motsjouables:
-            if valeur_mot(mot, dico) == valmeilleurmot:
+            if valeur_mot(mot, dico) == valmeilleurmot: # on compare avec la valeur du meilleur mot
                 res.append(mot)
     return res
             
