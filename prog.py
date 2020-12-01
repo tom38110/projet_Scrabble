@@ -74,7 +74,7 @@ def affiche_jetons(j): # on imagine que j est une liste de 3-uplets (j = [[lettr
                 print("||", end = '') # séparation des colonnes par || et des lignes par -- pour essayer de former un carré
         print()
 
-# testée : renvoie le dico de tous les jetons avec leurs occurences et leurs valeurs
+# testée : renvoie le dico de tous les jetons avec leurs occurrences et leurs valeurs
 def init_dico():
     dico = {'A': {'occ': 9, 'val': 1}, 'B': {'occ': 2, 'val': 3}, 'C': {'occ': 2, 'val': 3}, 'D': {'occ': 3, 'val': 2}, 'E': {'occ': 15, 'val': 1}, 'F': {'occ': 2, 'val': 4}, 'G': {'occ': 2, 'val': 2}, 'H': {'occ': 2, 'val': 4}, 'I': {'occ': 8, 'val': 1}, 'J': {'occ': 1, 'val': 8}, 'K': {'occ': 1, 'val': 10}, 'L': {'occ': 5, 'val': 1}, 'M': {'occ': 3, 'val': 2}, 'N': {'occ': 6, 'val': 1}, 'O': {'occ': 6, 'val': 1}, 'P': {'occ': 2, 'val': 3}, 'Q': {'occ': 1, 'val': 8}, 'R': {'occ': 6, 'val': 1}, 'S': {'occ': 6, 'val': 1}, 'T': {'occ': 6, 'val': 1}, 'U': {'occ': 6, 'val': 1}, 'V': {'occ': 2, 'val': 4}, 'W': {'occ': 1, 'val': 10}, 'X': {'occ': 1, 'val': 10}, 'Y': {'occ': 1, 'val': 10}, 'Z': {'occ': 1, 'val': 10}, '?': {'occ': 2, 'val': 0}}
     return dico
@@ -85,7 +85,7 @@ def init_dico():
 # for i in range(26):
 #     print(lettre)
 #     dico[lettre] = {'occ':' ','val':' '}
-#     dico[lettre]['occ'] = int(input("occurence : "))
+#     dico[lettre]['occ'] = int(input("occurrence : "))
 #     dico[lettre]['val'] = int(input("valeur : "))
 #     lettre = chr(ord(lettre)+1)
 # print(dico)
@@ -95,7 +95,7 @@ def init_pioche(dico):
     alphab = list(dico.keys()) # on récupère la liste des clés du dictionnaire
     sac = []
     for e in alphab: # e prends la valeur de chaque clé
-        for i in range(dico[e]['occ']): # boucle pour ajouter le jetons dans la liste autant de fois que son occurence
+        for i in range(dico[e]['occ']): # boucle pour ajouter le jetons dans la liste autant de fois que son occurrence
             sac.append(e)
     return sac
 
@@ -118,7 +118,7 @@ def completer_main(main,sac):
     for i in range(len(pioche)): # on rajoute ce qu'on a pioché à la main
         main.append(pioche[i])
 
-#pas testée : reçoit en paramètre la liste de jetons que le joueur veut échanger, sa main et le sac de jetons et effectue l'échange si c'est possible sinon renvoie que c'est pas possible
+# testée : reçoit en paramètre la liste de jetons que le joueur veut échanger, sa main et le sac de jetons et effectue l'échange si c'est possible sinon renvoie que c'est pas possible
 def echanger(jetons,main,sac): # jetons est la liste des jetons défaussés
     possible = True # booléen qui va dire si l'échange est possible
     maintemp = list(main) # création d'une main temporaire pour comparer avec jetons
@@ -230,12 +230,12 @@ def meilleurs_mots(motsfr,ll,dico):
 
 
 #prog.principal
-affiche_jetons([])
-dico = init_dico()
-sac = init_pioche(dico)
+affiche_jetons([]) # affiche le plateau avec les jetons joués dessus
+dico = init_dico() # initialise le dictionnaire avec tous les jetons, leur occurrence et leur valeur
+sac = init_pioche(dico) # initialise la pioche à partir du dictionnaire précédent
 nbj = int(input("Donnez le nombre de joueurs (entre 2 et 4) : "))
 while nbj < 2 or nbj > 4:
-    nbj = int(input("ERREUR, redonnez un nombre de joueurs entre 2 et 4 : "))
+    nbj = int(input("ERREUR, redonnez un nombre de joueurs entre 2 et 4 : ")) # tant que le nombre de joueur n'est pas entre 2 et 4 on redemande
 if nbj == 2:
     mainj1 = piocher(7, sac)
     print("Voici la main du joueur 1 :", mainj1)
@@ -255,16 +255,26 @@ else:
     mainj3 = piocher(7, sac)
     print("Voici la main du joueur 3 :", mainj3)
     mainj4 = piocher(7, sac)
-    print("Voici la main du joueur 4 :", mainj4)
-# jetons = []
-# jeton = input("Quel jeton voulez vous échanger ? ")
-# while len(jeton) == 1:
-#     jetons.append(jeton)
-#     jeton = input("Quel jeton voulez vous échanger ? ")
-# print(echanger(jetons, mainj1, sac))
-# print(mainj1)
-nf = open('littre.txt')
-motsfr = generer_dico(nf)
+    print("Voici la main du joueur 4 :", mainj4) # créer les mains en fonction du nombre de joueur
+jetons = []
+jeton = input("Quel jeton voulez vous échanger ? ")
+while len(jeton) == 1:
+    jetons.append(jeton)
+    jeton = input("Quel jeton voulez vous échanger ? ")
+print(echanger(jetons, mainj1, sac))
+print(mainj1) # on teste la fonction echanger avec la main du joueur 1
+lettre = input("Donnez le jeton que vous jouez : ")
+while lettre != 'stop':
+    mainj2.remove(lettre)
+    lettre = input("Redonnez un jeton que vous jouez (stop pour arrêter) : ")
+completer_main(mainj2, sac)
+print("Voici la main du joueur 2 recomplétée à partir de la pioche", sac, mainj2) # on teste la fonction completer_main avec la main du joueur 2
+nf = open('littre.txt') # on ouvre le fichier contenant tout les mots jouables au Scrabble
+motsfr = generer_dico(nf) # on créé une liste avec tous ces mots
 mot = input("Donnez un mot à jouer : ")
 print("Le mot", mot, "est jouable", mot_jouable(mot, mainj1))
-print("Voici la liste des mots jouables avec vos jetons :", mots_jouables(motsfr, mainj1))
+print("Voici la liste des mots jouables avec vos jetons :", mots_jouables(motsfr, mainj1)) # on teste les fonctions mot(s)_jouable(s)
+les_meilleurs = meilleurs_mots(motsfr, mainj1, dico)
+print("Voici la liste des meilleurs mots que vous pouvez jouer (ce qui rapport le plus de point) : ", les_meilleurs)
+for e in les_meilleurs:
+    print("Voici la valeur de", e, ":", valeur_mot(e, dico)) # on teste les fonctions qui donnent la valeur d'un mot
