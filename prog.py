@@ -249,7 +249,34 @@ def tester_placement(plateau,i,j,dir,mot):
                         lln.append(mot[k])
                     k = k + 1
     return lln
-                
+
+def placer_mot(plateau,lm,mot,i,j,dir):
+    lln = tester_placement(plateau, i , j, dir, mot)
+    lmtemp = list(lm)
+    possible = len(lln) <= len(lm) and len(mot) >= 2
+    k = 0
+    while possible and i < len(lln):
+        possible = lln[i] in lmtemp
+        if possible:
+            lmtemp.remove(lln[i]) 
+        k = k + 1
+    if possible :
+        if dir.lower() == 'horizontal':
+            for k in range(len(mot)):
+                if mot[k] in lln:
+                    lm.remove(mot[k])
+                    plateau[i][j+k] = mot[k]
+        if dir.lower() == 'vertical':
+            for k in range(len(mot)):
+                if mot[k] in lln:
+                    lm.remove(mot[k])
+                    plateau[i+k][j] = mot[k]
+    return possible
+
+def valeur_mot_bonus(plateau,lm,mot,i,j,dir):
+    reussi = placer_mot(plateau, lm, mot, i, j, dir)
+    if reussi:
+        
 
             
             
