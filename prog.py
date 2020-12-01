@@ -257,21 +257,21 @@ else:
     mainj4 = piocher(7, sac)
     print("Voici la main du joueur 4 :", mainj4) # créer les mains en fonction du nombre de joueur
 jetons = []
-jeton = input("Quel jeton voulez vous échanger ? ")
+jeton = input("Quel jeton voulez vous échanger j1 ? ")
 while len(jeton) == 1:
     jetons.append(jeton)
-    jeton = input("Quel jeton voulez vous échanger ? ")
+    jeton = input("Quel jeton voulez vous échanger j1 ? ")
 print(echanger(jetons, mainj1, sac))
 print(mainj1) # on teste la fonction echanger avec la main du joueur 1
-lettre = input("Donnez le jeton que vous jouez : ")
+lettre = input("Donnez le jeton que vous jouez j2 : ")
 while lettre != 'stop':
     mainj2.remove(lettre)
-    lettre = input("Redonnez un jeton que vous jouez (stop pour arrêter) : ")
+    lettre = input("Redonnez un jeton que vous jouez j2 (stop pour arrêter) : ")
 completer_main(mainj2, sac)
 print("Voici la main du joueur 2 recomplétée à partir de la pioche", sac, mainj2) # on teste la fonction completer_main avec la main du joueur 2
 nf = open('littre.txt') # on ouvre le fichier contenant tout les mots jouables au Scrabble
 motsfr = generer_dico(nf) # on créé une liste avec tous ces mots
-mot = input("Donnez un mot à jouer : ")
+mot = input("Donnez un mot à jouer j1 : ")
 print("Le mot", mot, "est jouable", mot_jouable(mot, mainj1))
 print("Voici la liste des mots jouables avec vos jetons :", mots_jouables(motsfr, mainj1)) # on teste les fonctions mot(s)_jouable(s)
 les_meilleurs = meilleurs_mots(motsfr, mainj1, dico)
