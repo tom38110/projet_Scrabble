@@ -286,19 +286,16 @@ def valeur_mot_bonus(plateau,lm,mot,i,j,dir):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+def tour_joueur(plateau):
+    affiche_jetons(j)
+    action=input("voulez vous passer/échanger/placer ?")
+    while not (action=="passer" or action=="échanger" or action=="placer"):
+        action=input("voulez vous passer/échanger/placer ?")
+    if action=="échanger":
+        
+    elif action=="passer":
+        
+    else:
 
 
 #prog.principal
@@ -309,25 +306,36 @@ nbj = int(input("Donnez le nombre de joueurs (entre 2 et 4) : "))
 while nbj < 2 or nbj > 4:
     nbj = int(input("ERREUR, redonnez un nombre de joueurs entre 2 et 4 : ")) # tant que le nombre de joueur n'est pas entre 2 et 4 on redemande
 if nbj == 2:
+    nom1=input("nom du premier joueur:")
+    nom2=input("nom du deuxieme joueur:")
     mainj1 = piocher(7, sac)
-    print("Voici la main du joueur 1 :", mainj1)
+    print("Voici la main de",nom1,":", mainj1)
     mainj2 = piocher(7, sac)
-    print("Voici la main du joueur 2 :", mainj2)
+    print("Voici la main de",nom2,":", mainj2)
 elif nbj == 3:
+    nom1=input("nom du premier joueur:")
+    nom2=input("nom du deuxieme joueur:")
+    nom3=input("nom du troisième joueur:")
     mainj1 = piocher(7, sac)
-    print("Voici la main du joueur 1 :", mainj1)
+    print("Voici la main de",nom1,":", mainj1)
     mainj2 = piocher(7, sac)
-    print("Voici la main du joueur 2 :", mainj2)
+    print("Voici la main de",nom2,":", mainj2)
     mainj3 = piocher(7,sac)
+    print("Voici la main de",nom3,":", mainj3)
 else:
+    nom1=input("nom du premier joueur:")
+    nom2=input("nom du deuxieme joueur:")
+    nom3=input("nom du troisième joueur:")
+    nom4=input("nom du quatrième joueur:")
     mainj1 = piocher(7, sac)
-    print("Voici la main du joueur 1 :", mainj1)
+    print("Voici la main de",nom1,":", mainj1)
     mainj2 = piocher(7, sac)
-    print("Voici la main du joueur 2 :", mainj2)
+    print("Voici la main de",nom2,";" ,mainj2)
     mainj3 = piocher(7, sac)
-    print("Voici la main du joueur 3 :", mainj3)
+    print("Voici la main de",nom3,":", mainj3)
     mainj4 = piocher(7, sac)
-    print("Voici la main du joueur 4 :", mainj4) # créer les mains en fonction du nombre de joueur
+    print("Voici la main de",nom4,":", mainj4) # créer les mains en fonction du nombre de joueur
+
 jetons = []
 jeton = input("Quel jeton voulez vous échanger j1 ? ")
 while len(jeton) == 1:
