@@ -108,7 +108,7 @@ def piocher(x,sac):
         sac.pop(indice) # on le supprime de la liste sac
     return main
 
-#pas testée : reçoit en paramètre la main du joueur et le sac sous forme de liste et complète la main si elle ne contient pas 7 jetons et si c'est possible
+# testée : reçoit en paramètre la main du joueur et le sac sous forme de liste et complète la main si elle ne contient pas 7 jetons et si c'est possible
 def completer_main(main,sac):
     x = 7 - len(main) # on définit le nombre de jetons à piocher
     if len(sac) >= x: # si c'est possible on complète
@@ -172,7 +172,7 @@ def mots_jouables(motsfr,ll):
             motsjouables.append(e)
     return motsjouables
 
-#pas testée : reçoit en paramètre un mot que le joueur veut jouer ainsi que le dictionnaire contenant tous les jetons et leur valeur et renvoie la valeur du mot en question
+# testée : reçoit en paramètre un mot que le joueur veut jouer ainsi que le dictionnaire contenant tous les jetons et leur valeur et renvoie la valeur du mot en question
 def valeur_mot(mot,dico):
     val = 0
     if len(mot) == 7: # si le mot a une longueur de 7 lettre rajoute direct 50 points
@@ -181,7 +181,7 @@ def valeur_mot(mot,dico):
         val = val + dico[e]['val'] # on rajoute la valeur de la lettre à la somme des valeurs de chaque lettre
     return val
 
-#pas testée : reçoit en paramètre la liste de tous les mots jouables au Scrabble, la main du joueur et le dictionnaire de tous les jetons avec leur valeur et renvoie le mot jouable qui rapporte le plus de point 
+# testée : reçoit en paramètre la liste de tous les mots jouables au Scrabble, la main du joueur et le dictionnaire de tous les jetons avec leur valeur et renvoie le mot jouable qui rapporte le plus de point 
 def meilleur_mot(motsfr,ll,dico): 
     result = ""
     valmeilleurmot = 0
@@ -193,7 +193,7 @@ def meilleur_mot(motsfr,ll,dico):
             valmeilleurmot = valmot
     return result # si il n'y a aucun mot on renvoie une chaîne vide
 
-#pas testée :  reçoit en paramètre la liste de tous les mots jouables au Scrabble, la main du joueur et le dictionnaire de tous les jetons avec leur valeur et renvoie la liste de tous les meilleurs mots jouables (qui font gagner le même nombre de point) 
+# testée :  reçoit en paramètre la liste de tous les mots jouables au Scrabble, la main du joueur et le dictionnaire de tous les jetons avec leur valeur et renvoie la liste de tous les meilleurs mots jouables (qui font gagner le même nombre de point) 
 def meilleurs_mots(motsfr,ll,dico):
     res = []
     meilleurmot = meilleur_mot(motsfr, ll, dico) # on récupère le meilleur mot jouable
@@ -205,6 +205,51 @@ def meilleurs_mots(motsfr,ll,dico):
                 res.append(mot)
     return res
             
+def lire_coord(jetons):
+    jetons = init_jetons()
+    i = int(input("Donnez la ligne sur laquelle vous voulez jouer (entre 1 et 16) : ")) # on demande de rentrer entre 1 et 16 car c'est plus intuitif pour le joueur mais par la suite on traitera i-1 et j-1 pour les indices de liste
+    j = int(input("Donnez la colonne sur laquelle vous voulez jouer (entre 1 et 16) : "))
+    while i < 1 or i > 16 or j < 1 or j > 16:
+        print("Pas compris dans les coordonnées du plateau")
+        i = int(input("Donnez la ligne sur laquelle vous voulez jouer (entre 1 et 16) : "))
+        j = int(input("Donnez la colonne sur laquelle vous voulez jouer (entre 1 et 16) : "))
+    liste_coord = [i-1, j-1]
+    return liste_coord
+
+def tester_placement(plateau,i,j,dir,mot):
+    lln = []
+    if plateau[i][j] == mot[0]:
+        if dir.lower() == 'horizontal':
+            if j + len(mot) - 1 < 15:
+                k = 1
+                while k < len(mot) and (plateau[i][j+k] == mot[k] or plateau[i][j+k] == "  "):
+                    if plateau[i][j+k] == "  ":
+                        lln.append(mot[k])
+                    k = k + 1
+        elif dir.lower() == 'vertical':
+            if i + len(mot) - 1 < 15:
+                k = 1
+                while k < len(mot) and (plateau[i+k][j] == mot[k] or plateau[i+k][j] == "  "):
+                    if plateau[i+k][j] == "  ":
+                        lln.append(mot[k])
+                    k = k + 1
+    elif plateau[i][j] == "  ":
+        if dir.lower() == 'horizontal':
+            if j + len(mot) - 1 < 15:
+                k = 0
+                while k < len(mot) and (plateau[i][j+k] == mot[k] or plateau[i][j+k] == "  "):
+                    if plateau[i][j+k] == "  ":
+                        lln.append(mot[k])
+                    k = k + 1
+        elif dir.lower() == 'vertical':
+            if i + len(mot) - 1 < 15:
+                k = 0
+                while k < len(mot) and (plateau[i+k][j] == mot[k] or plateau[i+k][j] == "  "):
+                    if plateau[i+k][j] == "  ":
+                        lln.append(mot[k])
+                    k = k + 1
+    return lln
+                
 
             
             
@@ -264,7 +309,7 @@ while len(jeton) == 1:
 print(echanger(jetons, mainj1, sac))
 print(mainj1) # on teste la fonction echanger avec la main du joueur 1
 lettre = input("Donnez le jeton que vous jouez j2 : ")
-while lettre != 'stop':
+while lettre.upper() != 'STOP':
     mainj2.remove(lettre)
     lettre = input("Redonnez un jeton que vous jouez j2 (stop pour arrêter) : ")
 completer_main(mainj2, sac)
@@ -278,5 +323,3 @@ les_meilleurs = meilleurs_mots(motsfr, mainj1, dico)
 print("Voici la liste des meilleurs mots que vous pouvez jouer (ce qui rapport le plus de point) : ", les_meilleurs)
 for e in les_meilleurs:
     print("Voici la valeur de", e, ":", valeur_mot(e, dico)) # on teste les fonctions qui donnent la valeur d'un mot
-
-scrable
