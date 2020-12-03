@@ -204,36 +204,37 @@ def meilleurs_mots(motsfr,ll,dico):
             if valeur_mot(mot, dico) == valmeilleurmot: # on compare avec la valeur du meilleur mot
                 res.append(mot)
     return res
-            
-def lire_coord(jetons):
-    jetons = init_jetons()
+
+#pas testée : qui demande à l'utilisateur là où il veut jouer au début et renvoie ces coordonnées sous forme d'une liste de deux éléments         
+def lire_coord():
     i = int(input("Donnez la ligne sur laquelle vous voulez jouer (entre 1 et 16) : ")) # on demande de rentrer entre 1 et 16 car c'est plus intuitif pour le joueur mais par la suite on traitera i-1 et j-1 pour les indices de liste
     j = int(input("Donnez la colonne sur laquelle vous voulez jouer (entre 1 et 16) : "))
     while i < 1 or i > 16 or j < 1 or j > 16:
         print("Pas compris dans les coordonnées du plateau")
         i = int(input("Donnez la ligne sur laquelle vous voulez jouer (entre 1 et 16) : "))
-        j = int(input("Donnez la colonne sur laquelle vous voulez jouer (entre 1 et 16) : "))
-    liste_coord = [i-1, j-1]
+        j = int(input("Donnez la colonne sur laquelle vous voulez jouer (entre 1 et 16) : ")) # si l'utilisateur ne rentre pas des coordonnées compris dans le plateau on redemande
+    liste_coord = [i-1, j-1] # on revient en base 0-15 pour correspondre à l'indice des listes
     return liste_coord
 
+#pas testée : reçoit en paramètre le plateau, les coordonnées où le joueur veut jouer, la direction et le mot à jouer, elle renvoie la liste des lettres nécessaires à rajouter depuis la main si le placement est possible, sinon elle renvoie une liste vide
 def tester_placement(plateau,i,j,dir,mot):
-    lln = []
-    if plateau[i][j] == mot[0]:
-        if dir.lower() == 'horizontal':
-            if j + len(mot) - 1 < 15:
+    lln = [] # initialisation de la liste des lettres nécessaires pour jouer le mot
+    if mot[0] in plateau[i][j]: # on vérifie si la première lettre de notre mot est là où on veut jouer
+        if dir.lower() == 'horizontal': # si place à l'horizontal, on va incrémenter les colonnes
+            if j + len(mot) - 1 < 15: # on test si ça va pas sortir du plateau
                 k = 1
-                while k < len(mot) and (plateau[i][j+k] == mot[k] or plateau[i][j+k] == "  "):
-                    if plateau[i][j+k] == "  ":
+                while k < len(mot) and (plateau[i][j+k] == mot[k] or plateau[i][j+k] == "  "): # tant qu'on rencontre pas une lettre qui n'est pas sensée être dans notre mot, on continue
+                    if plateau[i][j+k] == "  ": # si la lettre n'est pas sur le plateau, on rajoute la lettre à placer dans la liste de lettre nécessaire
                         lln.append(mot[k])
-                    k = k + 1
-        elif dir.lower() == 'vertical':
+                    k = k + 1 
+        elif dir.lower() == 'vertical': # idem si on va à la vertical sauf qu'on incrémente les lignes
             if i + len(mot) - 1 < 15:
                 k = 1
                 while k < len(mot) and (plateau[i+k][j] == mot[k] or plateau[i+k][j] == "  "):
                     if plateau[i+k][j] == "  ":
                         lln.append(mot[k])
                     k = k + 1
-    elif plateau[i][j] == "  ":
+    elif plateau[i][j] == "  ": # si la première de notre mot n'est pas là où on commence, on partir de k = 0 dans les for pour tester la première lettre
         if dir.lower() == 'horizontal':
             if j + len(mot) - 1 < 15:
                 k = 0
@@ -250,32 +251,60 @@ def tester_placement(plateau,i,j,dir,mot):
                     k = k + 1
     return lln
 
+#pas testée : reçoit en paramètre la plateau, la main du joueur, le mot à jouer, les coordonnées de départ ainsi que la direction de placement et renvoie si le placement a pu s'effectuer ou non (effectue le placement si possible)
 def placer_mot(plateau,lm,mot,i,j,dir):
-    lln = tester_placement(plateau, i , j, dir, mot)
-    lmtemp = list(lm)
-    possible = len(lln) <= len(lm) and len(mot) >= 2
+    lln = tester_placement(plateau, i , j, dir, mot) # on récupère la liste de lettre nécessaire
+    lmtemp = list(lm) # on créé une copie temporaire de la main du joueur pour la modifier
+    possible = len(lln) <= len(lm) and len(mot) >= 2 and len(lln) > 0 # on teste si on a assez de lettre dans la main pour combler les lettres manquantes, si le mot à bien un longueur de 2 au minimum et si il y a au moins une lettre à rajouter
     k = 0
-    while possible and i < len(lln):
+    while possible and i < len(lln): # on teste si le placement est possible en vérifiant si les les lettres nécessaires sont dans la main du joueur
         possible = lln[i] in lmtemp
-        if possible:
+        if possible: # si oui on enlève la lettre de la liste temporaire
             lmtemp.remove(lln[i]) 
         k = k + 1
-    if possible :
+    if possible : # si c'est possible on place les lettres manquantes
         if dir.lower() == 'horizontal':
             for k in range(len(mot)):
-                if mot[k] in lln:
+                if mot[k] in lln: # si la lettre du mot est dans la liste nécessaire, on le place
                     lm.remove(mot[k])
                     plateau[i][j+k] = mot[k]
-        if dir.lower() == 'vertical':
+        elif dir.lower() == 'vertical':
             for k in range(len(mot)):
                 if mot[k] in lln:
                     lm.remove(mot[k])
                     plateau[i+k][j] = mot[k]
     return possible
 
-def valeur_mot_bonus(plateau,lm,mot,i,j,dir):
-    reussi = placer_mot(plateau, lm, mot, i, j, dir)
+#pas testée : reçoit en paramètre le plateau, la main du joueur, le mot à jouer, les coordonnées de placement, la direction ainsi que le dictionnaire contenant tous les jetons avec leur valeur et renvoie la valeur du mot en prenant en compte les bonus du plateau (0 si le mot n'est pas jouable)
+def valeur_mot_bonus(plateau,lm,mot,i,j,dir,dico):
+    reussi = placer_mot(plateau, lm, mot, i, j, dir) # on vérifie que le mot a pu être jouer
+    valeurmot = 0
     if reussi:
+        valeurmot = valeur_mot(mot, dico) # on récupère la valeur initiale du mot
+        bonus = init_bonus() # on récupère la liste des bonus
+        if dir.lower() == 'horizontal':
+            for k in range(len(mot)): # si la lettre est sur une case bonus, on applique le bonus
+                if bonus[i][j+k] == "MT":
+                    valeurmot = valeurmot * 3 # on multiplie par 3 la valeur du mot pour mot compte triple
+                elif bonus[i][j+k] == "MD":
+                    valeurmot = valeurmot * 2 # on multiplie par 2 la valeur du mot pour mot compte double
+                elif bonus[i][j+k] == "LT":
+                    valeurmot = valeurmot + dico[mot[k]]['val'] * 2 # on ajoute 2 fois la valeur de la lettre pour lettre compte triple
+                elif bonus[i][j+k] == "LD":
+                    valeurmot = valeurmot + dico[mot[k]]['val'] # on ajoute 1 fois la valeur de la lettre pour lettre compte double
+                bonus[i][j+k] = "  " # on annule le bonus de la case utilisée pour pas qu'elle soit réutilisée
+        elif dir.lower() == 'vertical':
+            for k in range(len(mot)):
+                if bonus[i+k][j] == "MT":
+                    valeurmot = valeurmot * 3
+                elif bonus[i+k][j] == "MD":
+                    valeurmot = valeurmot * 2
+                elif bonus[i+k][j] == "LT":
+                    valeurmot = valeurmot + dico[mot[k]]['val'] * 2
+                elif bonus[i+k][j] == "LD":
+                    valeurmot = valeurmot + dico[mot[k]]['val'] 
+                bonus[i][j+k] = "  "
+    return valeurmot
         
 
             
