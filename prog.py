@@ -306,26 +306,49 @@ def valeur_mot_bonus(plateau,lm,mot,i,j,dir,dico):
                 bonus[i][j+k] = "  "
     return valeurmot
         
-
-            
-            
-
-
-
-
-
-
-def tour_joueur(plateau):
-    affiche_jetons(j)
-    action=input("voulez vous passer/échanger/placer ?")
-    while not (action=="passer" or action=="échanger" or action=="placer"):
-        action=input("voulez vous passer/échanger/placer ?")
-    if action=="échanger":
-        
-    elif action=="passer":
-        
-    else:
-
+def fin_de_partie(sac):   #detecte la fin de la partie quand il n'y a plus de jetons à piocher et qu'un joueur n'a plus de jetons dans sa main. 
+    return sac == 0 and (len(mainj1)==0 or len(mainj2)==0)
+    
+def tour_joueur(plateau,nom,main,score):
+    print(plateau)         #recoit en paramètre le plateau,le nom du joueur et sa main.Effectue les action du joueur lors de la partie.
+    print("c'est le tour de:",nom)
+    print("votre main:",main)
+    action=input("quelle action voulez vous réaliser(placer,piocher,passer):")
+    if action=="piocher":        #cas ou le joueur décide de piocher
+        jetons_a_echanger=[]        #on créer la liste de jetons que le joueur va vouloir échanger
+        jeton=input("quelle jetons voulez vous échanger:")
+        while len(jeton)==1 :         #le joueur s'arrete d'échanger ses lettres en tappant n'importe quelle mor de plus de 1 lettre.
+            jetons_a_echanger.append(jeton)              
+            jeton=input("quelle jetons voulez vous échanger:")
+        while not echanger(jetons_a_echanger,main,sac):         #on test si le joueur peut échanger ses lettres, sinon il peur réessayer.
+            print("vous ne posséder pas tous les jetons, échange impossible")  
+            jetons_a_echanger=[]
+            jeton=input("quelle jetons voulez vous échanger:")
+            while len(jeton)==1 :
+                jetons_a_echanger.append(jeton)
+                jeton=input("quelle jetons voulez vous échanger:")  
+        print("votre nouvelle main:",main)
+        return main
+    elif action=="placer":                  #cas ou le joueur décide de placer un mot
+        mot=input("quel mot voulez vous jouer:")
+        while not(mot in mots_jouables(nf,main)) :         #on test si le mot appartient bien au dictionnaire et si il est jouable a partir de la main
+            print("mot impossible")
+            mot=input("quel mot voulez vous jouer:")
+        liste_coord=lire_coord()                    #on demande les cooronnée de placement du mots
+        direction=input("dans quel direction voulez vous positionnez votre mot(horizontal ou vertical)? ")
+        placer_mot(plateau,main,mot,liste_coord[0],liste_coord[1],direction)     #on place le mot sur le plateau et si c'est impossible on recommence
+        while placer_mot(plateau,main,mot,liste_coord[0],liste_coord[1],direction) == False:
+            mot=input("quel mot voulez vous jouer:")
+            while  not (mot in mots_jouables(nf,main)) :
+                print("mot impossible")
+                mot=input("quel mot voulez vous jouer:")
+            liste_coord=lire_coord()
+            direction=input("dans quel direction voulez vous positionnez votre mot(horizontal ou vertical)? ")
+            placer_mot(plateau,main,mot,liste_coord[0],liste_coord[1],direction)
+        main=completer_main(main, sac)           #on complete la main du joueur
+        valeur=valeur_mot_bonus(plateau, main, mot, liste_coord[0], liste_coord[1], direction, dico)   #on calcule la valeur du mot poser en fonction des lettres et de son placement sur le plateau
+        print("le mot a rapporter",valeur,"points")
+        score = score + valeur     
 
 #prog.principal
 affiche_jetons([]) # affiche le plateau avec les jetons joués dessus
@@ -364,26 +387,70 @@ else:
     print("Voici la main de",nom3,":", mainj3)
     mainj4 = piocher(7, sac)
     print("Voici la main de",nom4,":", mainj4) # créer les mains en fonction du nombre de joueur
+nom_joueur_actif=nom1         #variable temporaire pour la fonction tour_joueur, change a chaqe tput de joueur
+joueur_actif=mainj1
+score_actif=scorej1
+while not fin_de_partie(sac):          #un tour de boucle correspond à l'action d'un joueur      
+    tour_joueur(plateau,nom_joueur_actif,joueur_actif,score_actif)
+    if joueur_actif==mainj1:        
+        scorej1=score_actif            #on réimplémente les score au joueur
+        mainj1=joueur_actif            #on redonne la main modifier au joueur
+        joueur_actif=mainj2
+        nom_joueur_actif=nom2
+        score_actif=scorej2
+    else:
+        scorej2=score_actif
+        mainj2=joueur_actif
+        joueure_actif=mainj1
+        nom_joueur_actif=nom1
+        score_actif=scorej2   
+    print(plateau)
+    print("SCORE: ",nom1,":",scorej1,"/",scorej2,":",nom2)    #affichage du plateau et du score
+mot=""
+if len(mainj1)==0:
+    for i in range(0,len(mainj2)):              #on concatenate toutes les lettres réstantes dans la main du dernier joueur.
+        mot=mot+mainj2[i]
+    scorej2 = scorej2 - valeur_mot(mot, dico)       #on soustrait la valeur du mot former avec les lettres restantes
+else:
+    for i in range(0,len(mainj1)):
+        mot=mot+mainj1[i]
+    scorej1 = scorej1 - valeur_mot(mot, dico)
+print("SCORE: ",nom1,":",scorej1,"/",scorej2,":",nom2)
+if scorej1 > scorej2:
+    print("VAINQUEUR:",nom1)
+else:
+    print("VAINQUER:",nom2)
 
-jetons = []
-jeton = input("Quel jeton voulez vous échanger j1 ? ")
-while len(jeton) == 1:
-    jetons.append(jeton)
-    jeton = input("Quel jeton voulez vous échanger j1 ? ")
-print(echanger(jetons, mainj1, sac))
-print(mainj1) # on teste la fonction echanger avec la main du joueur 1
-lettre = input("Donnez le jeton que vous jouez j2 : ")
-while lettre.upper() != 'STOP':
-    mainj2.remove(lettre)
-    lettre = input("Redonnez un jeton que vous jouez j2 (stop pour arrêter) : ")
-completer_main(mainj2, sac)
-print("Voici la main du joueur 2 recomplétée à partir de la pioche", sac, mainj2) # on teste la fonction completer_main avec la main du joueur 2
-nf = open('littre.txt') # on ouvre le fichier contenant tout les mots jouables au Scrabble
-motsfr = generer_dico(nf) # on créé une liste avec tous ces mots
-mot = input("Donnez un mot à jouer j1 : ")
-print("Le mot", mot, "est jouable", mot_jouable(mot, mainj1))
-print("Voici la liste des mots jouables avec vos jetons :", mots_jouables(motsfr, mainj1)) # on teste les fonctions mot(s)_jouable(s)
-les_meilleurs = meilleurs_mots(motsfr, mainj1, dico)
-print("Voici la liste des meilleurs mots que vous pouvez jouer (ce qui rapport le plus de point) : ", les_meilleurs)
-for e in les_meilleurs:
-    print("Voici la valeur de", e, ":", valeur_mot(e, dico)) # on teste les fonctions qui donnent la valeur d'un mot
+
+
+
+
+
+
+
+
+
+
+
+# jetons = []
+# jeton = input("Quel jeton voulez vous échanger j1 ? ")
+# while len(jeton) == 1:
+#     jetons.append(jeton)
+#     jeton = input("Quel jeton voulez vous échanger j1 ? ")
+# print(echanger(jetons, mainj1, sac))
+# print(mainj1) # on teste la fonction echanger avec la main du joueur 1
+# lettre = input("Donnez le jeton que vous jouez j2 : ")
+# while lettre.upper() != 'STOP':
+#     mainj2.remove(lettre)
+#     lettre = input("Redonnez un jeton que vous jouez j2 (stop pour arrêter) : ")
+# completer_main(mainj2, sac)
+# print("Voici la main du joueur 2 recomplétée à partir de la pioche", sac, mainj2) # on teste la fonction completer_main avec la main du joueur 2
+# nf = open('littre.txt') # on ouvre le fichier contenant tout les mots jouables au Scrabble
+# motsfr = generer_dico(nf) # on créé une liste avec tous ces mots
+# mot = input("Donnez un mot à jouer j1 : ")
+# print("Le mot", mot, "est jouable", mot_jouable(mot, mainj1))
+# print("Voici la liste des mots jouables avec vos jetons :", mots_jouables(motsfr, mainj1)) # on teste les fonctions mot(s)_jouable(s)
+# les_meilleurs = meilleurs_mots(motsfr, mainj1, dico)
+# print("Voici la liste des meilleurs mots que vous pouvez jouer (ce qui rapport le plus de point) : ", les_meilleurs)
+# for e in les_meilleurs:
+#     print("Voici la valeur de", e, ":", valeur_mot(e, dico)) # on teste les fonctions qui donnent la valeur d'un mot
