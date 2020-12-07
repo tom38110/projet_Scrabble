@@ -250,7 +250,7 @@ def tester_placement(plateau,i,j,dir,mot):
                     k = k + 1
     return lln
 
-# testée : reçoit en paramètre la plateau, la main du joueur, le mot à jouer, les coordonnées de départ ainsi que la direction de placement et renvoie si le placement a pu s'effectuer ou non (effectue le placement si possible)
+# testée : reçoit en paramètre la plateau, la main du joueur, le mot à jouer, les coordonnées de départ ainsi que la direction de placement et renvoie si le placement a pu s'effectuer ou non (effectue le placement si possible) ainsi que le mot au cas où si il a été modifié par les bonus "?"
 def placer_mot(plateau,lm,mot,i,j,dir):
     lln = tester_placement(plateau, i , j, dir, mot) # on récupère la liste de lettre nécessaire
     lmtemp = list(lm) # on créé une copie temporaire de la main du joueur pour la modifier
@@ -296,7 +296,6 @@ def placer_mot(plateau,lm,mot,i,j,dir):
 
 # testée : reçoit en paramètre le plateau, la main du joueur, le mot à jouer, les coordonnées de placement, la direction ainsi que le dictionnaire contenant tous les jetons avec leur valeur et renvoie la valeur du mot en prenant en compte les bonus du plateau (0 si le mot n'est pas jouable)
 def valeur_mot_bonus(plateau,lm,mot,i,j,dir,dico):
-    valeurmot = 0
     valeurmot = valeur_mot(mot, dico) # on récupère la valeur initiale du mot
     print(valeurmot)
     bonus = init_bonus() # on récupère la liste des bonus
@@ -324,35 +323,37 @@ def valeur_mot_bonus(plateau,lm,mot,i,j,dir,dico):
             bonus[i][j+k] = "  "
     print(valeurmot)
     return valeurmot
-        
+
+# testée : reçoit en paramètre le plateau, la main et le score du joueur, la pioche, le dictionnaire des jetons ainsi que la liste des mots autorisés au Scrabble; gère le tour du joueur et renvoie un booléen qui dit si la partie est finie 
 def tour_joueur(plateau,main,sac,motsfr,scorej,dico):
     affiche_jetons(plateau)
     print("Voici votre main :", main)
     action = input("Voulez-vous passer/échanger/placer ? ")
-    while not (action=="passer" or action=="échanger" or action=="placer"):
-        action=input("ERREUR; Voulez-vous passer/échanger/placer ? ")
+    while not (action == "passer" or action == "échanger" or action == "placer"):
+        action = input("ERREUR; Voulez-vous passer/échanger/placer ? ")
     if action == "échanger":
-        jetonsdefausses = []
+        jetonsdefausses = [] 
         j = input("Donnez un jeton que vous voulez échanger : ")
         while len(j) == 1:
             jetonsdefausses.append(j.upper())
-            j = input("Donnez un autre jeton que vous voulez échanger : ")
-        if len(jetonsdefausses) > 0:
-            print(echanger(jetonsdefausses, main, sac))
-        print("Voici votre main :", main)
+            j = input("Donnez un autre jeton que vous voulez échanger : ") # créer la liste de jetons que le joueur veut défausser
+        if len(jetonsdefausses) > 0: # si le joueur a bien échanger des jetons alors on appelle la fonction
+            print("L'échange a réussi :" echanger(jetonsdefausses, main, sac))
+        print("Voici votre main :", main) # montre la nouvelle main du joueur
     elif action == "placer":
-        liste_coord = lire_coord()
+        liste_coord = lire_coord() # demande les coordonnées de départ au joueur
         i = liste_coord[0]
-        j = liste_coord[1]
+        j = liste_coord[1] # on récupère ces coordonnées
         dir = input("Donnez la direction dans laquelle vous voulez jouer (horizontal/vertical) : ")
         while not (dir == "horizontal" or dir == "vertical"):
             dir = input("ERREUR; Donnez la direction dans laquelle vous voulez jouer (horizontal/vertical) : ")
         mot = input("Donnez le mot que vous voulez jouer en majuscule : ")
-        while not mot.upper() in motsfr:
+        while not mot.upper() in motsfr: # on vérifie si le mot est autorisés
             mot = input("ERREUR; Donnez le mot que vous voulez jouer en majuscule : ")
-        reussi = placer_mot(plateau, main, mot.upper(), i, j, dir)
-        print("Le placement a réussi :", reussi)
-        while not reussi:
+        reussi, mot = placer_mot(plateau, main, mot.upper(), i, j, dir)
+        print("Le placement a réussi :", reussi) # dit si le placement a réussi
+        passe = input("Voulez passer finalement ? (o/n) : ")
+        while not reussi and passe != "o": # tant qu'il n'a pas réussi on recommence (il peut décider de passer finalement)
             liste_coord = lire_coord()
             i = liste_coord[0]
             j = liste_coord[1]
@@ -364,9 +365,10 @@ def tour_joueur(plateau,main,sac,motsfr,scorej,dico):
                 mot = input("ERREUR; Donnez le mot que vous voulez jouer en majuscule : ")
             reussi, mot = placer_mot(plateau, main, mot.upper(), i, j, dir)
             print("Le placement a réussi :", reussi)
+            passe = input("Voulez passer finalement ? (o/n) : ")
         valeurmot = valeur_mot_bonus(plateau, main, mot, i, j, dir, dico)
         print("Voici la valeur du mot que vous venez de jouer :", valeurmot)
-        scorej = scorej + valeurmot
+        scorej = scorej + valeurmot # on récupère la valeur du mot avec les bonus et on l'ajoute au score du joueur
         print("Voici votre score :", scorej)
         print("Voici votre main :", main)
         if len(sac) < 7 - len(main) or len(sac) == 0:
@@ -376,6 +378,8 @@ def tour_joueur(plateau,main,sac,motsfr,scorej,dico):
             print("Voici votre main complétée :", main)
             finpartie = False
         return finpartie
+
+
         
 
 
