@@ -276,22 +276,26 @@ def placer_mot(plateau,lm,mot,i,j,dir):
                     if mot[k] in lln:
                         lm.remove(mot[k])
                         plateau[i+k][j] = mot[k]
+                        lln.remove(mot[k])
              else:
                 for k in range(len(mot)):
                     if mot[k] in lln: # si la lettre du mot est dans la liste nécessaire, on le place
                         lm.remove(mot[k])
                         plateau[i][j+k] = mot[k]
+                        lln.remove(mot[k])
         elif dir.lower() == 'vertical':
             if mot[0] in plateau[i][j]:
                 for k in range(1,len(mot)):
                     if mot[k] in lln:
                         lm.remove(mot[k])
                         plateau[i+k][j] = mot[k]
+                        lln.remove(mot[k])
             else:
                 for k in range(len(mot)):
                     if mot[k] in lln:
                         lm.remove(mot[k])
                         plateau[i+k][j] = mot[k]
+                        lln.remove(mot[k])
     return possible, mot
 
 # testée : reçoit en paramètre le plateau, la main du joueur, le mot à jouer, les coordonnées de placement, la direction ainsi que le dictionnaire contenant tous les jetons avec leur valeur et renvoie la valeur du mot en prenant en compte les bonus du plateau (0 si le mot n'est pas jouable)
@@ -353,7 +357,8 @@ def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,numeroj):
             mot = input("ERREUR; Donnez le mot que vous voulez jouer en majuscule : ")
         reussi, mot = placer_mot(plateau, inventaire_joueur[numeroj]['main'], mot.upper(), i, j, dir)
         print("Le placement a réussi :", reussi) # dit si le placement a réussi
-        passe = input("Voulez passer finalement ? (o/n) : ")
+        if not reussi:
+            passe = input("Voulez passer finalement ? (o/n) : ")
         while not reussi and passe != "o": # tant qu'il n'a pas réussi on recommence (il peut décider de passer finalement)
             liste_coord = lire_coord()
             i = liste_coord[0]
@@ -394,18 +399,17 @@ sac = init_pioche(dico) # initialise la pioche à partir du dictionnaire précé
 nbj = int(input("Donnez le nombre de joueurs (entre 2 et 4) : "))
 while nbj < 2 or nbj > 4:
     nbj = int(input("ERREUR, redonnez un nombre de joueurs entre 2 et 4 : ")) # tant que le nombre de joueur n'est pas entre 2 et 4 on redemande
-inventaire_joueurs=[]
+inventaire_joueurs = []
 for i in range(nbj):
-    d={}
-    nom=input("nom du joueur:")
-    d["nom"]=nom
+    d = {}
+    nom = input("Nom du joueur:")
+    d["nom"] = nom
     main=piocher(7,sac)
-    d["main"]=main
-    score=0
-    d["score"]=score
+    d["main"] = main
+    score = 0
+    d["score"] = score
     inventaire_joueurs.append(d)
-    print("voici la main de",nom,":",main)            # créer les mains en fonction du nombre de joueur
-
+    print("Voici la main de", nom, ":", main)            # créer les mains en fonction du nombre de joueur
 # jetons = []
 # jeton = input("Quel jeton voulez vous échanger j1 ? ")
 # while len(jeton) == 1:
@@ -428,6 +432,6 @@ motsfr = generer_dico(nf) # on créé une liste avec tous ces mots
 # print("Voici la liste des meilleurs mots que vous pouvez jouer (ce qui rapport le plus de point) : ", les_meilleurs)
 # for e in les_meilleurs:
 #     print("Voici la valeur de", e, ":", valeur_mot(e, dico)) # on teste les fonctions qui donnent la valeur d'un mot
-tour_joueur(plateau, mainj1, sac, motsfr, scorej1, dico)
-tour_joueur(plateau, mainj2, sac, motsfr, scorej2, dico)
+for joueur in range(nbj):
+    tour_joueur(plateau, inventaire_joueurs, sac, motsfr, dico, joueur)
 
