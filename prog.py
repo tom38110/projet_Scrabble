@@ -338,7 +338,7 @@ def tour_joueur(plateau,main,sac,motsfr,scorej,dico):
             jetonsdefausses.append(j.upper())
             j = input("Donnez un autre jeton que vous voulez échanger : ") # créer la liste de jetons que le joueur veut défausser
         if len(jetonsdefausses) > 0: # si le joueur a bien échanger des jetons alors on appelle la fonction
-            print("L'échange a réussi :" echanger(jetonsdefausses, main, sac))
+            print("L'échange a réussi :", echanger(jetonsdefausses, main, sac))
         print("Voici votre main :", main) # montre la nouvelle main du joueur
     elif action == "placer":
         liste_coord = lire_coord() # demande les coordonnées de départ au joueur
