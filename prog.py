@@ -401,9 +401,8 @@ for i in range(nbj):
     d["main"]=main
     score=0
     d["score"]=score
-    l.append(d)
-    print("voici la main de",nom,":",main)
-                                                   # créer les mains en fonction du nombre de joueur
+    inventaire_joueurs.append(d)
+    print("voici la main de",nom,":",main)            # créer les mains en fonction du nombre de joueur
 
 # jetons = []
 # jeton = input("Quel jeton voulez vous échanger j1 ? ")
