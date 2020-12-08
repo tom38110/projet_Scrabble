@@ -432,6 +432,6 @@ motsfr = generer_dico(nf) # on créé une liste avec tous ces mots
 # print("Voici la liste des meilleurs mots que vous pouvez jouer (ce qui rapport le plus de point) : ", les_meilleurs)
 # for e in les_meilleurs:
 #     print("Voici la valeur de", e, ":", valeur_mot(e, dico)) # on teste les fonctions qui donnent la valeur d'un mot
-for joueur in range(nbj):
+for joueur in range(nbj): # test
     tour_joueur(plateau, inventaire_joueurs, sac, motsfr, dico, joueur)
 
