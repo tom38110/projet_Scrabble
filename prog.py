@@ -323,7 +323,7 @@ def valeur_mot_bonus(plateau,lm,mot,i,j,dir,dico):
             bonus[i][j+k] = "  "
     print(valeurmot)
     return valeurmot
-    
+
 # testée : reçoit en paramètre le plateau, la main et le score du joueur, la pioche, le dictionnaire des jetons ainsi que la liste des mots autorisés au Scrabble; gère le tour du joueur et renvoie un booléen qui dit si la partie est finie 
 def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,numeroj):
     affiche_jetons(plateau)
@@ -394,46 +394,17 @@ sac = init_pioche(dico) # initialise la pioche à partir du dictionnaire précé
 nbj = int(input("Donnez le nombre de joueurs (entre 2 et 4) : "))
 while nbj < 2 or nbj > 4:
     nbj = int(input("ERREUR, redonnez un nombre de joueurs entre 2 et 4 : ")) # tant que le nombre de joueur n'est pas entre 2 et 4 on redemande
-if nbj == 2:
-    nom1 = input("Nom du premier joueur:")
-    nom2 = input("Nom du deuxieme joueur:")
-    mainj1 = piocher(7, sac)
-    scorej1 = 0
-    print("Voici la main de", nom1, ":", mainj1)
-    mainj2 = piocher(7, sac)
-    scorej2 = 0
-    print("Voici la main de", nom2, ":", mainj2)
-elif nbj == 3:
-    nom1 = input("Nom du premier joueur:")
-    nom2 = input("Nom du deuxieme joueur:")
-    nom3 = input("Nom du troisième joueur:")
-    mainj1 = piocher(7, sac)
-    scorej1 = 0
-    print("Voici la main de", nom1, ":", mainj1)
-    mainj2 = piocher(7, sac)
-    scorej2 = 0
-    print("Voici la main de", nom2, ":", mainj2)
-    mainj3 = piocher(7,sac)
-    scorej3 = 0
-    print("Voici la main de", nom3, ":", mainj3)
-else:
-    nom1 = input("Nom du premier joueur:")
-    nom2 = input("Nom du deuxieme joueur:")
-    nom3 = input("Nom du troisième joueur:")
-    nom4 = input("Nom du quatrième joueur:")
-    mainj1 = piocher(7, sac)
-    scorej1 = 0
-    print("Voici la main de", nom1, ":", mainj1)
-    mainj2 = piocher(7, sac)
-    scorej2 = 0
-    print("Voici la main de", nom2, ";", mainj2)
-    mainj3 = piocher(7, sac)
-    scorej3 = 0
-    print("Voici la main de", nom3, ":", mainj3)
-    mainj4 = piocher(7, sac)
-
-    scorej4 = 0
-    print("Voici la main de", nom4, ":", mainj4) # créer les mains en fonction du nombre de joueur
+inventaire_joueurs=[]
+for i in range(nbj):
+    d={}
+    nom=input("nom du joueur:")
+    d["nom"]=nom
+    main=piocher(7,sac)
+    d["main"]=main
+    score=0
+    d["score"]=score
+    inventaire_joueurs.append(d)
+    print("voici la main de",nom,":",main)            # créer les mains en fonction du nombre de joueur
 
 # jetons = []
 # jeton = input("Quel jeton voulez vous échanger j1 ? ")
