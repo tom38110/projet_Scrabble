@@ -325,9 +325,10 @@ def valeur_mot_bonus(plateau,lm,mot,i,j,dir,dico):
     return valeurmot
     
 # testée : reçoit en paramètre le plateau, la main et le score du joueur, la pioche, le dictionnaire des jetons ainsi que la liste des mots autorisés au Scrabble; gère le tour du joueur et renvoie un booléen qui dit si la partie est finie 
-def tour_joueur(plateau,main,sac,motsfr,scorej,dico):
+def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,numeroj):
     affiche_jetons(plateau)
-    print("Voici votre main :", main)
+    print("Tour de", inventaire_joueur[numeroj]['nom'])
+    print("Voici votre main", inventaire_joueur[numeroj]['nom'], ":", inventaire_joueur[numeroj]['main'])
     action = input("Voulez-vous passer/échanger/placer ? ")
     while not (action == "passer" or action == "échanger" or action == "placer"):
         action = input("ERREUR; Voulez-vous passer/échanger/placer ? ")
@@ -338,8 +339,8 @@ def tour_joueur(plateau,main,sac,motsfr,scorej,dico):
             jetonsdefausses.append(j.upper())
             j = input("Donnez un autre jeton que vous voulez échanger : ") # créer la liste de jetons que le joueur veut défausser
         if len(jetonsdefausses) > 0: # si le joueur a bien échanger des jetons alors on appelle la fonction
-            print("L'échange a réussi :", echanger(jetonsdefausses, main, sac))
-        print("Voici votre main :", main) # montre la nouvelle main du joueur
+            print("L'échange a réussi :", echanger(jetonsdefausses, inventaire[numeroj]['main'], sac))
+        print("Voici votre main :", inventaire_joueur[numeroj]['main']) # montre la nouvelle main du joueur
     elif action == "placer":
         liste_coord = lire_coord() # demande les coordonnées de départ au joueur
         i = liste_coord[0]
@@ -350,7 +351,7 @@ def tour_joueur(plateau,main,sac,motsfr,scorej,dico):
         mot = input("Donnez le mot que vous voulez jouer en majuscule : ")
         while not mot.upper() in motsfr: # on vérifie si le mot est autorisés
             mot = input("ERREUR; Donnez le mot que vous voulez jouer en majuscule : ")
-        reussi, mot = placer_mot(plateau, main, mot.upper(), i, j, dir)
+        reussi, mot = placer_mot(plateau, inventaire_joueur[numeroj]['main'], mot.upper(), i, j, dir)
         print("Le placement a réussi :", reussi) # dit si le placement a réussi
         passe = input("Voulez passer finalement ? (o/n) : ")
         while not reussi and passe != "o": # tant qu'il n'a pas réussi on recommence (il peut décider de passer finalement)
@@ -365,17 +366,18 @@ def tour_joueur(plateau,main,sac,motsfr,scorej,dico):
                 mot = input("ERREUR; Donnez le mot que vous voulez jouer en majuscule : ")
             reussi, mot = placer_mot(plateau, main, mot.upper(), i, j, dir)
             print("Le placement a réussi :", reussi)
-            passe = input("Voulez passer finalement ? (o/n) : ")
-        valeurmot = valeur_mot_bonus(plateau, main, mot, i, j, dir, dico)
+            if not reussi:
+                passe = input("Voulez passer finalement ? (o/n) : ")
+        valeurmot = valeur_mot_bonus(plateau, inventaire_joueur[numeroj]['main'], mot, i, j, dir, dico)
         print("Voici la valeur du mot que vous venez de jouer :", valeurmot)
-        scorej = scorej + valeurmot # on récupère la valeur du mot avec les bonus et on l'ajoute au score du joueur
-        print("Voici votre score :", scorej)
-        print("Voici votre main :", main)
-        if len(sac) < 7 - len(main) or len(sac) == 0: # on vérifie si c'est la fin de la partie
+        inventaire_joueur[numeroj]['score'] = inventaire_joueur[numeroj]['score'] + valeurmot # on récupère la valeur du mot avec les bonus et on l'ajoute au score du joueur
+        print("Voici votre score :", inventaire_joueur[numeroj]['score'])
+        print("Voici votre main :", inventaire_joueur[numeroj]['main'])
+        if len(sac) < 7 - len(inventaire_joueur[numeroj]['main']) or len(sac) == 0: # on vérifie si c'est la fin de la partie
             finpartie = True
         else:
-            completer_main(main, sac)
-            print("Voici votre main complétée :", main)
+            completer_main(inventaire_joueur[numeroj]['main'], sac)
+            print("Voici votre main complétée :", inventaire_joueur[numeroj]['main'])
             finpartie = False
         return finpartie
 
