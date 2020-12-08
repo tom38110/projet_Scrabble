@@ -33,13 +33,8 @@ def init_jetons():
     return jetons
 
 # testée : affiche le plateau dans la console avec les jetons joués reçu en paramètre
-def affiche_jetons(jetons): # on imagine que j est une liste de 3-uplets (j = [[lettre,i,j]...])
+def affiche_jetons(jetons): # jetons est la liste créée à partie de init_jetons
     bonus = init_bonus()
-    # for k in range(len(j)):
-        # lettre = j[k][0]
-        # ligne = j[k][1]
-        # colonne = j[k][2]
-        # jetons[ligne][colonne] = lettre
     for line in range(15):
         for col in range(15):
             if jetons[line][col] == "  ":
@@ -155,7 +150,7 @@ def mot_jouable(mot,ll):
     nbe = 0 # initialisation du nombre d'erreur
     for i in range(len(mot)): # boucle qui vérifie si chaque lettre du mot est dans la liste
         possible = possible and mot[i] in lltemp
-        if possible: # si oui enlève la lettre en question dans la liste temporaire pour pas qu'elle soit réutilisée
+        if mot[i] in lltemp: # si oui enlève la lettre en question dans la liste temporaire pour pas qu'elle soit réutilisée
             lltemp.remove(mot[i])
         elif mot[i] not in lltemp: # si la lettre n'est pas dans la liste temporaire augmente le nombre d'erreur
             nbe = nbe + 1
@@ -213,7 +208,7 @@ def lire_coord():
         i = int(input("Donnez la ligne sur laquelle vous voulez jouer (entre 1 et 16) : "))
         j = int(input("Donnez la colonne sur laquelle vous voulez jouer (entre 1 et 16) : ")) # si l'utilisateur ne rentre pas des coordonnées compris dans le plateau on redemande
     liste_coord = [i-1, j-1] # on revient en base 0-15 pour correspondre à l'indice des listes
-    return liste_coord
+    return liste_coord # return i-1, j-1 possible
 
 # testée : reçoit en paramètre le plateau, les coordonnées où le joueur veut jouer, la direction et le mot à jouer, elle renvoie la liste des lettres nécessaires à rajouter depuis la main si le placement est possible, sinon elle renvoie une liste vide
 def tester_placement(plateau,i,j,dir,mot):
@@ -298,10 +293,9 @@ def placer_mot(plateau,lm,mot,i,j,dir):
                         lln.remove(mot[k])
     return possible, mot
 
-# testée : reçoit en paramètre le plateau, la main du joueur, le mot à jouer, les coordonnées de placement, la direction ainsi que le dictionnaire contenant tous les jetons avec leur valeur et renvoie la valeur du mot en prenant en compte les bonus du plateau (0 si le mot n'est pas jouable)
-def valeur_mot_bonus(plateau,lm,mot,i,j,dir,dico):
+# testée : reçoit en paramètre le plateau, la main du joueur, le mot à jouer, les coordonnées de placement, la direction ainsi que le dictionnaire contenant tous les jetons avec leur valeur et la liste de listes des bonus; renvoie la valeur du mot en prenant en compte les bonus du plateau (0 si le mot n'est pas jouable)
+def valeur_mot_bonus(plateau,lm,mot,i,j,dir,dico,bonus):
     valeurmot = valeur_mot(mot, dico) # on récupère la valeur initiale du mot
-    bonus = init_bonus() # on récupère la liste des bonus
     if dir.lower() == 'horizontal':
         for k in range(len(mot)): # si la lettre est sur une case bonus, on applique le bonus
             if bonus[i][j+k] == "MT":
@@ -326,12 +320,12 @@ def valeur_mot_bonus(plateau,lm,mot,i,j,dir,dico):
             bonus[i][j+k] = "  "
     return valeurmot
 
-# testée : reçoit en paramètre l'inventaire de tout les joueurs ainsi que la pioche et vérifie si la partie est finie
+# testée : reçoit en paramètre l'inventaire de tous les joueurs ainsi que la pioche et vérifie si la partie est finie
 def fin_partie(inventaire_joueur,numeroj,sac):
     return len(sac) < 7 - len(inventaire_joueur[numeroj]['main']) or len(sac) == 0
 
-# testée : reçoit en paramètre le plateau, la main et le score du joueur, la pioche, le dictionnaire des jetons ainsi que la liste des mots autorisés au Scrabble; gère le tour du joueur et renvoie un booléen qui dit si la partie est finie 
-def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,numeroj):
+# testée : reçoit en paramètre le plateau, l'inventaire de tous les joueurs, la pioche, le dictionnaire des jetons ainsi que la liste des mots autorisés au Scrabble; gère le tour du joueur et renvoie un booléen qui dit si la partie est finie 
+def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,bonus,numeroj):
     affiche_jetons(plateau)
     print("Tour de", inventaire_joueur[numeroj]['nom'])
     print("Voici votre main", inventaire_joueur[numeroj]['nom'], ":", inventaire_joueur[numeroj]['main'])
@@ -350,7 +344,7 @@ def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,numeroj):
     elif action == "placer":
         liste_coord = lire_coord() # demande les coordonnées de départ au joueur
         i = liste_coord[0]
-        j = liste_coord[1] # on récupère ces coordonnées
+        j = liste_coord[1] # on récupère ces coordonnées sous forme de liste (on aurait pu faire un return avec deux valeurs)
         dir = input("Donnez la direction dans laquelle vous voulez jouer (horizontal/vertical) : ")
         while not (dir == "horizontal" or dir == "vertical"):
             dir = input("ERREUR; Donnez la direction dans laquelle vous voulez jouer (horizontal/vertical) : ")
@@ -362,6 +356,9 @@ def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,numeroj):
         if not reussi:
             passe = input("Voulez passer finalement ? (o/n) : ")
         while not reussi and passe != "o": # tant qu'il n'a pas réussi on recommence (il peut décider de passer finalement)
+            aide = input("Voulez-vous des idées de mots jouables ? (o/n) :") # on propose de l'aide si le joueur bloque et ne sais pas quoi jouer
+            if aide == 'o':
+                print("Voici une liste de mot que vous pouvez jouer avec votre main :", mots_jouables(motsfr, inventaire_joueur[numeroj]['main']))
             liste_coord = lire_coord()
             i = liste_coord[0]
             j = liste_coord[1]
@@ -371,13 +368,13 @@ def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,numeroj):
             mot = input("Donnez le mot que vous voulez jouer en majuscule : ")
             while not mot.upper() in motsfr:
                 mot = input("ERREUR; Donnez le mot que vous voulez jouer en majuscule : ")
-            reussi, mot = placer_mot(plateau, main, mot.upper(), i, j, dir)
+            reussi, mot = placer_mot(plateau, inventaire_joueur[numeroj]['main'], mot.upper(), i, j, dir)
             print("Le placement a réussi :", reussi)
             if not reussi:
                 passe = input("Voulez passer finalement ? (o/n) : ")
         if reussi:
             affiche_jetons(plateau)
-            valeurmot = valeur_mot_bonus(plateau, inventaire_joueur[numeroj]['main'], mot, i, j, dir, dico)
+            valeurmot = valeur_mot_bonus(plateau, inventaire_joueur[numeroj]['main'], mot, i, j, dir, dico, bonus)
             print("Voici la valeur du mot que vous venez de jouer :", valeurmot)
             inventaire_joueur[numeroj]['score'] = inventaire_joueur[numeroj]['score'] + valeurmot # on récupère la valeur du mot avec les bonus et on l'ajoute au score du joueur
             print("Voici votre score :", inventaire_joueur[numeroj]['score'])
@@ -390,14 +387,15 @@ def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,numeroj):
 
 # testée : reçoit en paramètre le numéro du joueur qui a joué et le nombre de joueur dans la partie et renvoie le numéro du prochain joueur
 def detection_prochainj(numeroj,nbj):
-    if numeroj < nbj - 1:
+    if numeroj < nbj - 1: # tant qu'on est pas au dernier joueur on incrémente
         numeroj = numeroj + 1
-    else:
+    else: # dès qu'on est au dernier joueur on repart du premier joueur
         numeroj = 0
     return numeroj
 
 #prog.principal
-plateau = init_jetons()
+plateau = init_jetons() # on initialise le plateau
+bonus = init_bonus() # on initialise les bonus
 affiche_jetons(plateau) # affiche le plateau avec les jetons joués dessus
 dico = init_dico() # initialise le dictionnaire avec tous les jetons, leur occurrence et leur valeur
 sac = init_pioche(dico) # initialise la pioche à partir du dictionnaire précédent
@@ -409,29 +407,29 @@ while nbj < 2 or nbj > 4:
 inventaire_joueurs = []
 for i in range(nbj):
     d = {}
-    nom = input("Nom du joueur:")
+    nom = input("Nom du joueur : ")
     d["nom"] = nom
-    main=piocher(7,sac)
+    main = piocher(7,sac)
     d["main"] = main
     score = 0
     d["score"] = score
     inventaire_joueurs.append(d)
-    print("Voici la main de", nom, ":", main) # créer les mains en fonction du nombre de joueur
+    print("Voici la main de", nom, ":", main) # créer un inventaire de tous les joueurs avec leurs noms, mains et scores dans une liste de dictionnaires
 finpartie = False
 numeroj = 0
-while not finpartie:
-    finpartie = tour_joueur(plateau, inventaire_joueurs, sac, motsfr, dico, numeroj)
-    numeroj = detection_prochainj(numeroj, nbj)
-meilleurscore = -1
+while not finpartie: # tant qu'on a pas fini la partie on joue
+    finpartie = tour_joueur(plateau, inventaire_joueurs, sac, motsfr, dico, bonus, numeroj) # gère le tour du joueur
+    numeroj = detection_prochainj(numeroj, nbj) # passe au joueur suivant
+meilleurscore = -1 # on initialise le meilleur score
 for j in range(len(inventaire_joueurs)):
-    main = inventaire_joueurs[j]['main']
-    score = inventaire_joueurs[j]['score']
-    malus = 0
-    for lettre in main:
+    main = inventaire_joueurs[j]['main'] # on récupère la main du joueur
+    score = inventaire_joueurs[j]['score'] # ainsi que son score
+    malus = 0 # on initialise le malus
+    for lettre in main: # on regarde toutes les lettres qui reste dans la main du joueur et on ajoute leur valeur au malus
         malus = malus + dico[lettre]['val']
-    inventaire_joueurs[j]['score'] = score - malus
-    if inventaire_joueurs[j]['score'] > meilleurscore:
+    inventaire_joueurs[j]['score'] = score - malus # on soustrait le malus au score
+    if inventaire_joueurs[j]['score'] > meilleurscore: # si son score est plus grand que le meilleur score on garde en mémoire son score
         meilleurscore = inventaire_joueurs[j]['score']
         vainqueur = inventaire_joueurs[j]['nom']
-    print("Voici le score de", inventaire_joueurs[j]['nom'], ":", inventaire_joueurs[j]['score'])
-print("Le vainqueur est :", vainqueur, "avec", meilleurscore, "points")
+    print("Voici le score de", inventaire_joueurs[j]['nom'], ":", inventaire_joueurs[j]['score']) # on affiche le score du joueur
+print("Le vainqueur est :", vainqueur, "avec", meilleurscore, "points") # on affiche le vainqueur
