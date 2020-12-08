@@ -275,7 +275,7 @@ def placer_mot(plateau,lm,mot,i,j,dir):
                 for k in range(1,len(mot)):
                     if mot[k] in lln:
                         lm.remove(mot[k])
-                        plateau[i+k][j] = mot[k]
+                        plateau[i][j+k] = mot[k]
                         lln.remove(mot[k])
              else:
                 for k in range(len(mot)):
@@ -301,7 +301,6 @@ def placer_mot(plateau,lm,mot,i,j,dir):
 # testée : reçoit en paramètre le plateau, la main du joueur, le mot à jouer, les coordonnées de placement, la direction ainsi que le dictionnaire contenant tous les jetons avec leur valeur et renvoie la valeur du mot en prenant en compte les bonus du plateau (0 si le mot n'est pas jouable)
 def valeur_mot_bonus(plateau,lm,mot,i,j,dir,dico):
     valeurmot = valeur_mot(mot, dico) # on récupère la valeur initiale du mot
-    print(valeurmot)
     bonus = init_bonus() # on récupère la liste des bonus
     if dir.lower() == 'horizontal':
         for k in range(len(mot)): # si la lettre est sur une case bonus, on applique le bonus
@@ -325,8 +324,11 @@ def valeur_mot_bonus(plateau,lm,mot,i,j,dir,dico):
             elif bonus[i+k][j] == "LD":
                 valeurmot = valeurmot + dico[mot[k]]['val'] 
             bonus[i][j+k] = "  "
-    print(valeurmot)
     return valeurmot
+
+# testée : reçoit en paramètre l'inventaire de tout les joueurs ainsi que la pioche et vérifie si la partie est finie
+def fin_partie(inventaire_joueur,numeroj,sac):
+    return len(sac) < 7 - len(inventaire_joueur[numeroj]['main']) or len(sac) == 0
 
 # testée : reçoit en paramètre le plateau, la main et le score du joueur, la pioche, le dictionnaire des jetons ainsi que la liste des mots autorisés au Scrabble; gère le tour du joueur et renvoie un booléen qui dit si la partie est finie 
 def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,numeroj):
@@ -343,7 +345,7 @@ def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,numeroj):
             jetonsdefausses.append(j.upper())
             j = input("Donnez un autre jeton que vous voulez échanger : ") # créer la liste de jetons que le joueur veut défausser
         if len(jetonsdefausses) > 0: # si le joueur a bien échanger des jetons alors on appelle la fonction
-            print("L'échange a réussi :", echanger(jetonsdefausses, inventaire[numeroj]['main'], sac))
+            print("L'échange a réussi :", echanger(jetonsdefausses, inventaire_joueur[numeroj]['main'], sac))
         print("Voici votre main :", inventaire_joueur[numeroj]['main']) # montre la nouvelle main du joueur
     elif action == "placer":
         liste_coord = lire_coord() # demande les coordonnées de départ au joueur
@@ -373,29 +375,34 @@ def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,numeroj):
             print("Le placement a réussi :", reussi)
             if not reussi:
                 passe = input("Voulez passer finalement ? (o/n) : ")
-        valeurmot = valeur_mot_bonus(plateau, inventaire_joueur[numeroj]['main'], mot, i, j, dir, dico)
-        print("Voici la valeur du mot que vous venez de jouer :", valeurmot)
-        inventaire_joueur[numeroj]['score'] = inventaire_joueur[numeroj]['score'] + valeurmot # on récupère la valeur du mot avec les bonus et on l'ajoute au score du joueur
-        print("Voici votre score :", inventaire_joueur[numeroj]['score'])
-        print("Voici votre main :", inventaire_joueur[numeroj]['main'])
-        if len(sac) < 7 - len(inventaire_joueur[numeroj]['main']) or len(sac) == 0: # on vérifie si c'est la fin de la partie
-            finpartie = True
-        else:
+        if reussi:
+            affiche_jetons(plateau)
+            valeurmot = valeur_mot_bonus(plateau, inventaire_joueur[numeroj]['main'], mot, i, j, dir, dico)
+            print("Voici la valeur du mot que vous venez de jouer :", valeurmot)
+            inventaire_joueur[numeroj]['score'] = inventaire_joueur[numeroj]['score'] + valeurmot # on récupère la valeur du mot avec les bonus et on l'ajoute au score du joueur
+            print("Voici votre score :", inventaire_joueur[numeroj]['score'])
+            print("Voici votre main :", inventaire_joueur[numeroj]['main'])
+        finpartie = fin_partie(inventaire_joueur, numeroj, sac)
+        if not finpartie: # on vérifie si c'est la fin de la partie
             completer_main(inventaire_joueur[numeroj]['main'], sac)
             print("Voici votre main complétée :", inventaire_joueur[numeroj]['main'])
-            finpartie = False
         return finpartie
 
-
-        
-
-
+# testée : reçoit en paramètre le numéro du joueur qui a joué et le nombre de joueur dans la partie et renvoie le numéro du prochain joueur
+def detection_prochainj(numeroj,nbj):
+    if numeroj < nbj - 1:
+        numeroj = numeroj + 1
+    else:
+        numeroj = 0
+    return numeroj
 
 #prog.principal
 plateau = init_jetons()
 affiche_jetons(plateau) # affiche le plateau avec les jetons joués dessus
 dico = init_dico() # initialise le dictionnaire avec tous les jetons, leur occurrence et leur valeur
 sac = init_pioche(dico) # initialise la pioche à partir du dictionnaire précédent
+nf = open('littre.txt') # on ouvre le fichier contenant tout les mots jouables au Scrabble
+motsfr = generer_dico(nf) # on créé une liste avec tous ces mots
 nbj = int(input("Donnez le nombre de joueurs (entre 2 et 4) : "))
 while nbj < 2 or nbj > 4:
     nbj = int(input("ERREUR, redonnez un nombre de joueurs entre 2 et 4 : ")) # tant que le nombre de joueur n'est pas entre 2 et 4 on redemande
@@ -409,29 +416,22 @@ for i in range(nbj):
     score = 0
     d["score"] = score
     inventaire_joueurs.append(d)
-    print("Voici la main de", nom, ":", main)            # créer les mains en fonction du nombre de joueur
-# jetons = []
-# jeton = input("Quel jeton voulez vous échanger j1 ? ")
-# while len(jeton) == 1:
-#     jetons.append(jeton)
-#     jeton = input("Quel jeton voulez vous échanger j1 ? ")
-# print(echanger(jetons, mainj1, sac))
-# print(mainj1) # on teste la fonction echanger avec la main du joueur 1
-# lettre = input("Donnez le jeton que vous jouez j2 : ")
-# while lettre.upper() != 'STOP':
-#     mainj2.remove(lettre)
-#     lettre = input("Redonnez un jeton que vous jouez j2 (stop pour arrêter) : ")
-# completer_main(mainj2, sac)
-# print("Voici la main du joueur 2 recomplétée à partir de la pioche", sac, mainj2) # on teste la fonction completer_main avec la main du joueur 2
-nf = open('littre.txt') # on ouvre le fichier contenant tout les mots jouables au Scrabble
-motsfr = generer_dico(nf) # on créé une liste avec tous ces mots
-# mot = input("Donnez un mot à jouer j1 : ")
-# print("Le mot", mot, "est jouable", mot_jouable(mot, mainj1))
-# print("Voici la liste des mots jouables avec vos jetons :", mots_jouables(motsfr, mainj1)) # on teste les fonctions mot(s)_jouable(s)
-# les_meilleurs = meilleurs_mots(motsfr, mainj1, dico)
-# print("Voici la liste des meilleurs mots que vous pouvez jouer (ce qui rapport le plus de point) : ", les_meilleurs)
-# for e in les_meilleurs:
-#     print("Voici la valeur de", e, ":", valeur_mot(e, dico)) # on teste les fonctions qui donnent la valeur d'un mot
-for joueur in range(nbj): # test
-    tour_joueur(plateau, inventaire_joueurs, sac, motsfr, dico, joueur)
-
+    print("Voici la main de", nom, ":", main) # créer les mains en fonction du nombre de joueur
+finpartie = False
+numeroj = 0
+while not finpartie:
+    finpartie = tour_joueur(plateau, inventaire_joueurs, sac, motsfr, dico, numeroj)
+    numeroj = detection_prochainj(numeroj, nbj)
+meilleurscore = -1
+for j in range(len(inventaire_joueurs)):
+    main = inventaire_joueurs[j]['main']
+    score = inventaire_joueurs[j]['score']
+    malus = 0
+    for lettre in main:
+        malus = malus + dico[lettre]['val']
+    inventaire_joueurs[j]['score'] = score - malus
+    if inventaire_joueurs[j]['score'] > meilleurscore:
+        meilleurscore = inventaire_joueurs[j]['score']
+        vainqueur = inventaire_joueurs[j]['nom']
+    print("Voici le score de", inventaire_joueurs[j]['nom'], ":", inventaire_joueurs[j]['score'])
+print("Le vainqueur est :", vainqueur, "avec", meilleurscore, "points")
