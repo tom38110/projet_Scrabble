@@ -217,81 +217,99 @@ def tester_placement(plateau,i,j,dir,mot):
         if dir.lower() == 'horizontal': # si place à l'horizontal, on va incrémenter les colonnes
             if j + len(mot) - 1 < 15: # on test si ça va pas sortir du plateau
                 k = 1
-                while k < len(mot) and (plateau[i][j+k] == mot[k] or plateau[i][j+k] == "  "): # tant qu'on rencontre pas une lettre qui n'est pas sensée être dans notre mot, on continue
+                while k < len(mot): # tant qu'on rencontre pas une lettre qui n'est pas sensée être dans notre mot, on continue
                     if plateau[i][j+k] == "  ": # si la lettre n'est pas sur le plateau, on rajoute la lettre à placer dans la liste de lettre nécessaire
                         lln.append(mot[k])
+                    elif plateau[i][j+k] != mot[k]:
+                        lln=[]
+                        break
                     k = k + 1 
         elif dir.lower() == 'vertical': # idem si on va à la vertical sauf qu'on incrémente les lignes
             if i + len(mot) - 1 < 15:
                 k = 1
-                while k < len(mot) and (plateau[i+k][j] == mot[k] or plateau[i+k][j] == "  "):
+                while k < len(mot):
                     if plateau[i+k][j] == "  ":
                         lln.append(mot[k])
+                    elif plateau[i+k][j] != mot[k]:
+                        lln=[]
+                        break
                     k = k + 1
     elif plateau[i][j] == "  ": # si la première de notre mot n'est pas là où on commence, on partir de k = 0 dans les for pour tester la première lettre
         if dir.lower() == 'horizontal':
             if j + len(mot) - 1 < 15:
                 k = 0
-                while k < len(mot) and (plateau[i][j+k] == mot[k] or plateau[i][j+k] == "  "):
+                while k < len(mot):
                     if plateau[i][j+k] == "  ":
                         lln.append(mot[k])
+                    elif plateau[i][j+k] != mot[k]:
+                        lln=[]
+                        break
                     k = k + 1
         elif dir.lower() == 'vertical':
             if i + len(mot) - 1 < 15:
                 k = 0
-                while k < len(mot) and (plateau[i+k][j] == mot[k] or plateau[i+k][j] == "  "):
+                while k < len(mot):
                     if plateau[i+k][j] == "  ":
                         lln.append(mot[k])
+                    elif plateau[i+k][j] != mot[k]:
+                        lln=[]
+                        break
                     k = k + 1
     return lln
 
 # testée : reçoit en paramètre la plateau, la main du joueur, le mot à jouer, les coordonnées de départ ainsi que la direction de placement et renvoie si le placement a pu s'effectuer ou non (effectue le placement si possible) ainsi que le mot au cas où si il a été modifié par les bonus "?"
 def placer_mot(plateau,lm,mot,i,j,dir):
     lln = tester_placement(plateau, i , j, dir, mot) # on récupère la liste de lettre nécessaire
-    lmtemp = list(lm) # on créé une copie temporaire de la main du joueur pour la modifier
-    possible = len(lln) <= len(lm) and len(mot) >= 2 and len(lln) > 0 # on teste si on a assez de lettre dans la main pour combler les lettres manquantes, si le mot à bien un longueur de 2 au minimum et si il y a au moins une lettre à rajouter
-    k = 0
-    while possible and k < len(lln): # on teste si le placement est possible en vérifiant si les les lettres nécessaires sont dans la main du joueur
-        possible = lln[k] in lmtemp
-        if possible: # si oui on enlève la lettre de la liste temporaire
-            lmtemp.remove(lln[k]) 
-        else:
-            if "?" in lmtemp:
-                lmtemp.remove("?")
-                possible = True
-                lln[k] = "?"
-                lmottemp = list(mot)
-                lmottemp[k] = "?"
-                mot = "".join(lmottemp)
-        k = k + 1
-    if possible : # si c'est possible on place les lettres manquantes
-        if dir.lower() == 'horizontal':
-             if mot[0] in plateau[i][j]:
-                for k in range(1,len(mot)):
-                    if mot[k] in lln:
-                        lm.remove(mot[k])
-                        plateau[i][j+k] = mot[k]
-                        lln.remove(mot[k])
-             else:
-                for k in range(len(mot)):
-                    if mot[k] in lln: # si la lettre du mot est dans la liste nécessaire, on le place
-                        lm.remove(mot[k])
-                        plateau[i][j+k] = mot[k]
-                        lln.remove(mot[k])
-        elif dir.lower() == 'vertical':
-            if mot[0] in plateau[i][j]:
-                for k in range(1,len(mot)):
-                    if mot[k] in lln:
-                        lm.remove(mot[k])
-                        plateau[i+k][j] = mot[k]
-                        lln.remove(mot[k])
+    if len(lln)!=0:
+        lmtemp = list(lm) # on créé une copie temporaire de la main du joueur pour la modifier
+        possible = len(lln) <= len(lm) and len(mot) >= 2 and len(lln) > 0 # on teste si on a assez de lettre dans la main pour combler les lettres manquantes, si le mot à bien un longueur de 2 au minimum et si il y a au moins une lettre à rajouter
+        k = 0
+        while possible and k < len(lln): # on teste si le placement est possible en vérifiant si les les lettres nécessaires sont dans la main du joueur
+            possible = lln[k] in lmtemp
+            if possible: # si oui on enlève la lettre de la liste temporaire
+                lmtemp.remove(lln[k]) 
             else:
-                for k in range(len(mot)):
-                    if mot[k] in lln:
-                        lm.remove(mot[k])
-                        plateau[i+k][j] = mot[k]
-                        lln.remove(mot[k])
-    return possible, mot
+                if "?" in lmtemp:
+                    lmtemp.remove("?")
+                    possible = True
+                    lln[k] = "?"
+                    lmottemp = list(mot)
+                    lmottemp[k] = "?"
+                    mot = "".join(lmottemp)
+            k = k + 1
+        if possible : # si c'est possible on place les lettres manquantes
+            if dir.lower() == 'horizontal':
+                if mot[0] in plateau[i][j]:
+                    for k in range(1,len(mot)):
+                        if mot[k] in lln:
+                            lm.remove(mot[k])
+                            plateau[i][j+k] = mot[k]
+                            lln.remove(mot[k])
+                else:
+                    for k in range(len(mot)):
+                        if mot[k] in lln: # si la lettre du mot est dans la liste nécessaire, on le place
+                            lm.remove(mot[k])
+                            plateau[i][j+k] = mot[k]
+                            lln.remove(mot[k])
+            elif dir.lower() == 'vertical':
+                if mot[0] in plateau[i][j]:
+                    for k in range(1,len(mot)):
+                        if mot[k] in lln:
+                            lm.remove(mot[k])
+                            plateau[i+k][j] = mot[k]
+                            lln.remove(mot[k])
+                else:
+                    for k in range(len(mot)):
+                        if mot[k] in lln:
+                            lm.remove(mot[k])
+                            plateau[i+k][j] = mot[k]
+                            lln.remove(mot[k])
+    else:
+        possible=False
+    d={}
+    d["possible"]=possible
+    d["mot"]=mot
+    return d
 
 # testée : reçoit en paramètre le plateau, la main du joueur, le mot à jouer, les coordonnées de placement, la direction ainsi que le dictionnaire contenant tous les jetons avec leur valeur et la liste de listes des bonus; renvoie la valeur du mot en prenant en compte les bonus du plateau (0 si le mot n'est pas jouable)
 def valeur_mot_bonus(plateau,lm,mot,i,j,dir,dico,bonus):
@@ -329,7 +347,7 @@ def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,bonus,numeroj):
     affiche_jetons(plateau)
     print("Tour de", inventaire_joueur[numeroj]['nom'])
     print("Voici votre main", inventaire_joueur[numeroj]['nom'], ":", inventaire_joueur[numeroj]['main'])
-    action = input("Voulez-vous passer/échanger/placer ? ")
+    action = input("Voulez-vous passer/échanger/placer ? ").lower()
     while not (action == "passer" or action == "échanger" or action == "placer"):
         action = input("ERREUR; Voulez-vous passer/échanger/placer ? ")
     if action == "échanger":
@@ -349,13 +367,21 @@ def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,bonus,numeroj):
         while not (dir == "horizontal" or dir == "vertical"):
             dir = input("ERREUR; Donnez la direction dans laquelle vous voulez jouer (horizontal/vertical) : ")
         mot = input("Donnez le mot que vous voulez jouer en majuscule : ")
-        while not mot.upper() in motsfr: # on vérifie si le mot est autorisés
-            mot = input("ERREUR; Donnez le mot que vous voulez jouer en majuscule : ")
-        reussi, mot = placer_mot(plateau, inventaire_joueur[numeroj]['main'], mot.upper(), i, j, dir)
-        print("Le placement a réussi :", reussi) # dit si le placement a réussi
-        if not reussi:
+        passe="n"
+        while not mot.upper() in motsfr and passe != "o": # on vérifie si le mot est autorisés
+            print("ERREUR,le mot que vous voulez jouez n'existe pas")
             passe = input("Voulez passer finalement ? (o/n) : ")
-        while not reussi and passe != "o": # tant qu'il n'a pas réussi on recommence (il peut décider de passer finalement)
+            if passe=="n":
+                aide = input("Voulez-vous des idées de mots jouables ? (o/n) :") # on propose de l'aide si le joueur bloque et ne sais pas quoi jouer 
+                if aide=="o":
+                    print("Voici une liste de mot que vous pouvez jouer avec votre main :", mots_jouables(motsfr, inventaire_joueur[numeroj]['main']))
+            elif passe=="o":
+                break
+            mot = input( "Donnez le mot que vous voulez jouer en majuscule : ")
+        possible_et_mot = placer_mot(plateau, inventaire_joueur[numeroj]['main'], mot.upper(), i, j, dir)
+        reussi=possible_et_mot["possible"]
+        print("Le placement a réussi :", reussi) # dit si le placement a réussi
+        while not reussi : # tant qu'il n'a pas réussi on recommence (il peut décider de passer finalement)
             aide = input("Voulez-vous des idées de mots jouables ? (o/n) :") # on propose de l'aide si le joueur bloque et ne sais pas quoi jouer
             if aide == 'o':
                 print("Voici une liste de mot que vous pouvez jouer avec votre main :", mots_jouables(motsfr, inventaire_joueur[numeroj]['main']))
@@ -366,24 +392,32 @@ def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,bonus,numeroj):
             while not (dir == "horizontal" or dir == "vertical"):
                 dir = input("ERREUR; Donnez la direction dans laquelle vous voulez jouer (horizontal/vertical) : ")
             mot = input("Donnez le mot que vous voulez jouer en majuscule : ")
-            while not mot.upper() in motsfr:
-                mot = input("ERREUR; Donnez le mot que vous voulez jouer en majuscule : ")
-            reussi, mot = placer_mot(plateau, inventaire_joueur[numeroj]['main'], mot.upper(), i, j, dir)
-            print("Le placement a réussi :", reussi)
-            if not reussi:
+            passe="n"
+            while not mot.upper() in motsfr and passe != "o": # on vérifie si le mot est autorisés
+                print("ERREUR,le mot que vous voulez jouez n'existe pas")
                 passe = input("Voulez passer finalement ? (o/n) : ")
-        if reussi:
-            affiche_jetons(plateau)
-            valeurmot = valeur_mot_bonus(plateau, inventaire_joueur[numeroj]['main'], mot, i, j, dir, dico, bonus)
-            print("Voici la valeur du mot que vous venez de jouer :", valeurmot)
-            inventaire_joueur[numeroj]['score'] = inventaire_joueur[numeroj]['score'] + valeurmot # on récupère la valeur du mot avec les bonus et on l'ajoute au score du joueur
-            print("Voici votre score :", inventaire_joueur[numeroj]['score'])
-            print("Voici votre main :", inventaire_joueur[numeroj]['main'])
-        finpartie = fin_partie(inventaire_joueur, numeroj, sac)
-        if not finpartie: # on vérifie si c'est la fin de la partie
-            completer_main(inventaire_joueur[numeroj]['main'], sac)
-            print("Voici votre main complétée :", inventaire_joueur[numeroj]['main'])
-        return finpartie
+                if passe=="n":
+                    aide = input("Voulez-vous des idées de mots jouables ? (o/n) :") # on propose de l'aide si le joueur bloque et ne sais pas quoi jouer 
+                    if aide=="o":
+                        print("Voici une liste de mot que vous pouvez jouer avec votre main :", mots_jouables(motsfr, inventaire_joueur[numeroj]['main']))
+                elif passe=="o":
+                    break
+                mot = input("Donnez le mot que vous voulez jouer en majuscule : ")
+            possible_et_mot = placer_mot(plateau, inventaire_joueur[numeroj]['main'], mot.upper(), i, j, dir)
+            reussi=possible_et_mot["possible"]
+            print("Le placement a réussi :", reussi) # dit si le placement a réussi
+        mot=possible_et_mot["mot"]
+        affiche_jetons(plateau)
+        valeurmot = valeur_mot_bonus(plateau, inventaire_joueur[numeroj]['main'], mot, i, j, dir, dico, bonus)
+        print("Voici la valeur du mot que vous venez de jouer :", valeurmot)
+        inventaire_joueur[numeroj]['score'] = inventaire_joueur[numeroj]['score'] + valeurmot # on récupère la valeur du mot avec les bonus et on l'ajoute au score du joueur
+        print("Voici votre score :", inventaire_joueur[numeroj]['score'])
+        print("Voici votre main :", inventaire_joueur[numeroj]['main'])
+    finpartie = fin_partie(inventaire_joueur, numeroj, sac)
+    if not finpartie: # on vérifie si c'est la fin de la partie
+        completer_main(inventaire_joueur[numeroj]['main'], sac)
+        print("Voici votre main complétée :", inventaire_joueur[numeroj]['main'])
+    return finpartie
 
 # testée : reçoit en paramètre le numéro du joueur qui a joué et le nombre de joueur dans la partie et renvoie le numéro du prochain joueur
 def detection_prochainj(numeroj,nbj):
