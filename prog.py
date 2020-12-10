@@ -376,43 +376,48 @@ def tour_joueur(plateau,inventaire_joueur,sac,motsfr,dico,bonus,numeroj):
                 if aide=="o":
                     print("Voici une liste de mot que vous pouvez jouer avec votre main :", mots_jouables(motsfr, inventaire_joueur[numeroj]['main']))
             elif passe=="o":
+                reussi=True
                 break
             mot = input( "Donnez le mot que vous voulez jouer en majuscule : ")
-        possible_et_mot = placer_mot(plateau, inventaire_joueur[numeroj]['main'], mot.upper(), i, j, dir)
-        reussi=possible_et_mot["possible"]
-        print("Le placement a réussi :", reussi) # dit si le placement a réussi
-        while not reussi : # tant qu'il n'a pas réussi on recommence (il peut décider de passer finalement)
-            aide = input("Voulez-vous des idées de mots jouables ? (o/n) :") # on propose de l'aide si le joueur bloque et ne sais pas quoi jouer
-            if aide == 'o':
-                print("Voici une liste de mot que vous pouvez jouer avec votre main :", mots_jouables(motsfr, inventaire_joueur[numeroj]['main']))
-            liste_coord = lire_coord()
-            i = liste_coord[0]
-            j = liste_coord[1]
-            dir = input("Donnez la direction dans laquelle vous voulez jouer (horizontal/vertical) : ")
-            while not (dir == "horizontal" or dir == "vertical"):
-                dir = input("ERREUR; Donnez la direction dans laquelle vous voulez jouer (horizontal/vertical) : ")
-            mot = input("Donnez le mot que vous voulez jouer en majuscule : ")
-            passe="n"
-            while not mot.upper() in motsfr and passe != "o": # on vérifie si le mot est autorisés
-                print("ERREUR,le mot que vous voulez jouez n'existe pas")
-                passe = input("Voulez passer finalement ? (o/n) : ")
-                if passe=="n":
-                    aide = input("Voulez-vous des idées de mots jouables ? (o/n) :") # on propose de l'aide si le joueur bloque et ne sais pas quoi jouer 
-                    if aide=="o":
-                        print("Voici une liste de mot que vous pouvez jouer avec votre main :", mots_jouables(motsfr, inventaire_joueur[numeroj]['main']))
-                elif passe=="o":
-                    break
-                mot = input("Donnez le mot que vous voulez jouer en majuscule : ")
+        if not passe=="o":
             possible_et_mot = placer_mot(plateau, inventaire_joueur[numeroj]['main'], mot.upper(), i, j, dir)
             reussi=possible_et_mot["possible"]
             print("Le placement a réussi :", reussi) # dit si le placement a réussi
-        mot=possible_et_mot["mot"]
-        affiche_jetons(plateau)
-        valeurmot = valeur_mot_bonus(plateau, inventaire_joueur[numeroj]['main'], mot, i, j, dir, dico, bonus)
-        print("Voici la valeur du mot que vous venez de jouer :", valeurmot)
-        inventaire_joueur[numeroj]['score'] = inventaire_joueur[numeroj]['score'] + valeurmot # on récupère la valeur du mot avec les bonus et on l'ajoute au score du joueur
-        print("Voici votre score :", inventaire_joueur[numeroj]['score'])
-        print("Voici votre main :", inventaire_joueur[numeroj]['main'])
+            while not reussi : # tant qu'il n'a pas réussi on recommence (il peut décider de passer finalement)
+                aide = input("Voulez-vous des idées de mots jouables ? (o/n) :") # on propose de l'aide si le joueur bloque et ne sais pas quoi jouer
+                if aide == 'o':
+                    print("Voici une liste de mot que vous pouvez jouer avec votre main :", mots_jouables(motsfr, inventaire_joueur[numeroj]['main']))
+                liste_coord = lire_coord()
+                i = liste_coord[0]
+                j = liste_coord[1]
+                dir = input("Donnez la direction dans laquelle vous voulez jouer (horizontal/vertical) : ")
+                while not (dir == "horizontal" or dir == "vertical"):
+                    dir = input("ERREUR; Donnez la direction dans laquelle vous voulez jouer (horizontal/vertical) : ")
+                mot = input("Donnez le mot que vous voulez jouer en majuscule : ")
+                passe="n"
+                while not mot.upper() in motsfr and passe != "o": # on vérifie si le mot est autorisés
+                    print("ERREUR,le mot que vous voulez jouez n'existe pas")
+                    passe = input("Voulez passer finalement ? (o/n) : ")
+                    if passe=="n":
+                        aide = input("Voulez-vous des idées de mots jouables ? (o/n) :") # on propose de l'aide si le joueur bloque et ne sais pas quoi jouer 
+                        if aide=="o":
+                            print("Voici une liste de mot que vous pouvez jouer avec votre main :", mots_jouables(motsfr, inventaire_joueur[numeroj]['main']))
+                    elif passe=="o":
+                        reussi=True
+                        break
+                    mot = input("Donnez le mot que vous voulez jouer en majuscule : ")
+                if not passe=="o":
+                    possible_et_mot = placer_mot(plateau, inventaire_joueur[numeroj]['main'], mot.upper(), i, j, dir)
+                    reussi=possible_et_mot["possible"]
+                    print("Le placement a réussi :", reussi) # dit si le placement a réussi
+        if not passe=="o":
+            mot=possible_et_mot["mot"]
+            affiche_jetons(plateau)
+            valeurmot = valeur_mot_bonus(plateau, inventaire_joueur[numeroj]['main'], mot, i, j, dir, dico, bonus)
+            print("Voici la valeur du mot que vous venez de jouer :", valeurmot)
+            inventaire_joueur[numeroj]['score'] = inventaire_joueur[numeroj]['score'] + valeurmot # on récupère la valeur du mot avec les bonus et on l'ajoute au score du joueur
+            print("Voici votre score :", inventaire_joueur[numeroj]['score'])
+            print("Voici votre main :", inventaire_joueur[numeroj]['main'])
     finpartie = fin_partie(inventaire_joueur, numeroj, sac)
     if not finpartie: # on vérifie si c'est la fin de la partie
         completer_main(inventaire_joueur[numeroj]['main'], sac)
